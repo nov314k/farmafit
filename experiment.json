@@ -1,0 +1,57 @@
+{
+  "experiment_name": "Experiment 1",
+  "data_points": [
+    {
+      "mins": 0,
+      "percentage": 5
+    },
+    {
+      "mins": 30,
+      "percentage": 12
+    },
+    {
+      "mins": 60,
+      "percentage": 16
+    },
+    {
+      "mins": 90,
+      "percentage": 18
+    },
+    {
+      "mins": 120,
+      "percentage": 22
+    },
+    {
+      "mins": 150,
+      "percentage": 33
+    },
+    {
+      "mins": 180,
+      "percentage": 36
+    },
+    {
+      "mins": 240,
+      "percentage": 39
+    },
+    {
+      "mins": 300,
+      "percentage": 45
+    },
+    {
+      "mins": 360,
+      "percentage": 57
+    },
+    {
+      "mins": 420,
+      "percentage": 59
+    },
+    {
+      "mins": 480,
+      "percentage": 62
+    },
+    {
+      "mins": 600,
+      "percentage": 65
+    }
+  ]
+}
