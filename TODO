@@ -1,26 +1,21 @@
 /*******************************************************************************
-Write readme.
-
-Get a couple of screenshots.
-
-Document error codes for fmf_gtdpts
-
+Add README.
+Fix output to the screen
+Multiple experiments.
+Exporting to CSV.
+Change input file to `input.json.
+Change "mins" to "minutes"
+Add screenshots to README.md.
+Further explain rsq in README.
+Document error codes for fmf_gtdpts.
+Check that there are at least two measurement points?
+      (perhaps after removing the first measurement)
 Use typedef struct dp {...} and typedef struct lr {...}?
-
-Add a constant for where the experiment file is located.
-
-Create a standard way to process --help --version.
-In conjunction with this, create ways to automatically insert version names and numbers.
+Add support for --help and --version.
+Add tests (ptest?)
 
 Change the types of linear_regression() arguments so there is no need
 for converting from a linked list of data points to two separate arrays.
 Or perhaps change the linear_regression functions to accept the linked
 list as the input so the calculations can be done from there.
-
-Work out how to use ptest.
-
-Include one ptest based on the current set of experimental values.
-
-Add the ptest testing framework tests.
-
 *******************************************************************************/
