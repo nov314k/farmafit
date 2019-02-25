@@ -1,0 +1,17 @@
+{ "experiment_name": "Experiment F11",
+  "data_points":
+  [
+      { "minutes": 0,   "percentage": 0      },
+      { "minutes": 15,  "percentage": 4.820  },
+      { "minutes": 30,  "percentage": 6.705  },
+      { "minutes": 45,  "percentage": 8.507  },
+      { "minutes": 60,  "percentage": 10.534 },
+      { "minutes": 90,  "percentage": 15.458 },
+      { "minutes": 120, "percentage": 24.736 },      
+      { "minutes": 150, "percentage": 33.048 },    
+      { "minutes": 180, "percentage": 34.818 },
+      { "minutes": 240, "percentage": 44.960 },
+      { "minutes": 300, "percentage": 53.014 },
+      { "minutes": 360, "percentage": 58.676 }
+  ]
+}

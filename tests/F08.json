@@ -1,0 +1,17 @@
+{ "experiment_name": "Experiment F8",
+  "data_points":
+  [
+      { "minutes": 0,   "percentage": 0      },
+      { "minutes": 15,  "percentage": 4.920  },
+      { "minutes": 30,  "percentage": 6.307  },
+      { "minutes": 45,  "percentage": 7.984  },
+      { "minutes": 60,  "percentage": 9.459  },
+      { "minutes": 90,  "percentage": 13.042 },
+      { "minutes": 120, "percentage": 16.322 },      
+      { "minutes": 150, "percentage": 19.339 },    
+      { "minutes": 180, "percentage": 22.648 },
+      { "minutes": 240, "percentage": 27.535 },
+      { "minutes": 300, "percentage": 32.510 },
+      { "minutes": 360, "percentage": 34.711 }
+  ]
+}

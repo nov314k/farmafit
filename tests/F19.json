@@ -1,0 +1,17 @@
+{ "experiment_name": "Experiment F19",
+  "data_points":
+  [
+      { "minutes": 0,   "percentage": 0      },
+      { "minutes": 15,  "percentage": 6.201  },
+      { "minutes": 30,  "percentage": 6.234  },
+      { "minutes": 45,  "percentage": 7.294  },
+      { "minutes": 60,  "percentage": 8.733  },
+      { "minutes": 90,  "percentage": 12.096 },
+      { "minutes": 120, "percentage": 17.359 },      
+      { "minutes": 150, "percentage": 20.693 },    
+      { "minutes": 180, "percentage": 24.481 },
+      { "minutes": 240, "percentage": 33.078 },
+      { "minutes": 300, "percentage": 38.097 },
+      { "minutes": 360, "percentage": 44.346 }
+  ]
+}

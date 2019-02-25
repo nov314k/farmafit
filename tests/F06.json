@@ -1,0 +1,17 @@
+{ "experiment_name": "Experiment F6",
+  "data_points":
+  [
+      { "minutes": 0,   "percentage": 0      },
+      { "minutes": 15,  "percentage": 9.245  },
+      { "minutes": 30,  "percentage": 13.736 },
+      { "minutes": 45,  "percentage": 21.426 },
+      { "minutes": 60,  "percentage": 29.877 },
+      { "minutes": 90,  "percentage": 42.221 },
+      { "minutes": 120, "percentage": 51.853 },      
+      { "minutes": 150, "percentage": 60.969 },    
+      { "minutes": 180, "percentage": 68.657 },
+      { "minutes": 240, "percentage": 76.433 },
+      { "minutes": 300, "percentage": 84.442 },
+      { "minutes": 360, "percentage": 86.924 }
+  ]
+}

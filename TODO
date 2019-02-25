@@ -11,6 +11,7 @@ Add checks for zero values?
 Use typedef struct dp {...} and typedef struct lr {...}?
 Add support for --help and --version.
 Add tests (ptest?)
+Perhaps decrease the number of decimal points?
 
 Change the types of linear_regression() arguments so there is no need
 for converting from a linked list of data points to two separate arrays.

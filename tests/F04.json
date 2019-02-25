@@ -1,0 +1,17 @@
+{ "experiment_name": "Experiment F4",
+  "data_points":
+  [
+      { "minutes": 0,   "percentage": 0      },
+      { "minutes": 15,  "percentage": 4.709  },
+      { "minutes": 30,  "percentage": 6.016  },
+      { "minutes": 45,  "percentage": 7.540  },
+      { "minutes": 60,  "percentage": 9.035  },
+      { "minutes": 90,  "percentage": 12.665 },
+      { "minutes": 120, "percentage": 16.960 },      
+      { "minutes": 150, "percentage": 21.534 },    
+      { "minutes": 180, "percentage": 25.171 },
+      { "minutes": 240, "percentage": 29.972 },
+      { "minutes": 300, "percentage": 36.203 },
+      { "minutes": 360, "percentage": 39.692 }
+  ]
+}
