@@ -1,6 +1,8 @@
 # _Farmafit_
 _Farmafit_ extracts model parameters for modelling the release of pharmacological substances.
 
+![Screenshot](/screenshot.png "Screenshot")
+
 ## Configuration
 
 All development and testing was done on Cygwin. No special configuration provisions are needed.
