@@ -1,4 +1,4 @@
-# Farmafit
+# _Farmafit_
 Extracts model parameters for modelling the release of pharmacological substances.
 
 ## Configuration
@@ -17,47 +17,47 @@ cJSON, the ultraweight JSON parser,  [github.com/DaveGamble/cJSON](https://githu
 
 Edit `input.json` in root directory using a plain text editor.
 
-For "experiment_name", put a suitable experiment name/identifier (enclosed in double quotation marks). This identifier is only used for clearer reporting of results. 
+For _"experiment_name"_, enter a suitable experiment name/identifier (enclosed in double quotation marks). This identifier is used only for clearer reporting of results. 
 
-For each of "data_points", enter "minutes" and "percentage". Minutes is the number of minutes elapsed from the start of the experiment, and "percentage" is the percentage of the substance dissolved at that time. Values for "minutes" and "percentage" are entered without double quotes.
+For each of _"data_points"_, enter _"minutes"_ and _"percentage"_. Minutes is the number of minutes elapsed from the start of the experiment (when _"minutes"_ = 0), and _"percentage"_ is the percentage of the substance dissolved at that time. Values for _"minutes"_ and _"percentage"_ are entered without double quotes.
 
-Program assumes the measurement values are sorted in ascending "minutes".
+Program assumes the measurement values are sorted in ascending order of _"minutes"_ values.
 
-While the code will produce some results with a single data points, those results will not make much sense. Also, note that for some models we cannot use data points where "mins" = 0 and/or "percentage" = 0. This is because we apply the natural logarithm function to these values, and `log(0)` is not usefully defined. For models where the `log` function is used, Farmafit simply eliminates the first data point, with the assumption that zero-valued "minutes" and/or "percentage" are located there.
+While the code will produce some results with a single data point, those results will not make much sense. Note that, for some models, we cannot use data points where _"mins"_ = 0 and/or _"percentage"_ = 0. This is because we apply the natural logarithm function to these values, and `log(0)` is not usefully defined. For models where the `log` function is used, _Farmafit_ simply eliminates the first data point, with the assumption that the first data point probably contains zero-valued _"minutes"_ and/or _"percentage"_.
 
 Use ASCII characters only. Decimal point separator (.) must be used for rational numbers. Decimal comma separator (,) is not supported.
 
 Once experimental data is entered into `input.json` execute `./farmafit.exe` in the root directory. Results are displayed on the screen.
 
-## Models and Farmafit output
+## Models and _Farmafit_ output
 
-Farmafit calculates parameters of the following models. In all equations `Q` represents the percentage of the dissolved substance, and `t` is time in minutes.
+_Farmafit_ calculates parameters of the models listed in this section. In all equations, `Q` represents the percentage of the dissolved substance, and `t` is elapsed time in minutes.
 
-For all models, r-squared `rsq` value is used to measure goodness of fit.
+For all models, r-squared `rsq` value is used to measure the goodness of fit.
 
 ### Zero-order kinetics
 
 Model equation: `Q = k0 * t`
 
-Farmafit calculates `k0`.
+_Farmafit_ calculates `k0`.
 
 ### First-order kinetics
 
 Model equation: `Q = (1 - exp (-k1 * t)) * 100`
 
-Farmafit calculates `k1`.
+_Farmafit_ calculates `k1`.
 
 ### Higuchi's equation
 
 Model equation: `Q = kh * sqrt (t)`
 
-Farmafit calculates `kh`.
+_Farmafit_ calculates `kh`.
 
 ### Peppas' equation
 
 Model equation: `Q = k * t^n`
 
-Farmafit calculates `k` and `n`.
+_Farmafit_ calculates `k` and `n`.
 
 ## Documentation
 
