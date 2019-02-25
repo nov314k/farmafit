@@ -1,5 +1,5 @@
 # _Farmafit_
-Extracts model parameters for modelling the release of pharmacological substances.
+_Farmafit_ extracts model parameters for modelling the release of pharmacological substances.
 
 ## Configuration
 
@@ -25,9 +25,32 @@ Program assumes the measurement values are sorted in ascending order of _"minute
 
 While the code will produce some results with a single data point, those results will not make much sense. Note that, for some models, we cannot use data points where _"mins"_ = 0 and/or _"percentage"_ = 0. This is because we apply the natural logarithm function to these values, and `log(0)` is not usefully defined. For models where the `log` function is used, _Farmafit_ simply eliminates the first data point, with the assumption that the first data point probably contains zero-valued _"minutes"_ and/or _"percentage"_.
 
+There is no upper limit as to how many data points can be entered.
+
 Use ASCII characters only. Decimal point separator (.) must be used for rational numbers. Decimal comma separator (,) is not supported.
 
 Once experimental data is entered into `input.json` execute `./farmafit.exe` in the root directory. Results are displayed on the screen.
+
+## Sample input file
+
+Here is the contents of a sample `input.json` file:
+
+```
+{ "experiment_name": "Experiment F1",
+  "data_points":
+  [
+      { "minutes": 0,   "percentage": 0      },
+      { "minutes": 15,  "percentage": 8.803  },
+      { "minutes": 30,  "percentage": 11.935 },
+      { "minutes": 45,  "percentage": 15.316 },
+      { "minutes": 60,  "percentage": 19.195 },
+    
+      ...
+    
+      { "minutes": 360, "percentage": 79.588 }
+  ]
+}
+```
 
 ## Models and _Farmafit_ output
 
@@ -37,25 +60,25 @@ For all models, r-squared `rsq` value is used to measure the goodness of fit.
 
 ### Zero-order kinetics
 
-Model equation: `Q = k0 * t`
+Given model equation: `Q = k0 * t`
 
 _Farmafit_ calculates `k0`.
 
 ### First-order kinetics
 
-Model equation: `Q = (1 - exp (-k1 * t)) * 100`
+Given model equation: `Q = (1 - exp (-k1 * t)) * 100`
 
 _Farmafit_ calculates `k1`.
 
 ### Higuchi's equation
 
-Model equation: `Q = kh * sqrt (t)`
+Given model equation: `Q = kh * sqrt (t)`
 
 _Farmafit_ calculates `kh`.
 
 ### Peppas' equation
 
-Model equation: `Q = k * t^n`
+Given model equation: `Q = k * t^n`
 
 _Farmafit_ calculates `k` and `n`.
 
