@@ -1,11 +1,7 @@
 /*******************************************************************************
-Add README.
-Change the email in the COPYRIGHT notice.
-Fix output to the screen
+Check if input file is present.
 Multiple experiments.
 Exporting to CSV.
-Change input file to `input.json.
-Change "mins" to "minutes"
 Add screenshots to README.md.
 Further explain rsq in README.
 Document error codes for fmf_gtdpts.

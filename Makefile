@@ -1,8 +1,8 @@
 #!/usr/bin/make -f
 SHELL = /bin/sh
 CC = gcc
-CFLAGS = -Wall -std=c99
-EXE = farmafit.exe
+CFLAGS = -Wall -std=c99 -pedantic
+EXE = farmafit
 OBJECTS = farmafit.o main.o cJSON.o
 SOURCES = src/farmafit.c src/main.c 
 LIBRARIES = lib/cJSON.c

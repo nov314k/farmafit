@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2019 Novak Petrovic                                           * 
- * dev2 <@> novak5 <.> 33mail <.> com                                          *
+ * <dev2[at]novak5[.]33mail[.]com>                                             *
  *                                                                             *
  * This file is part of Farmafit.                                              *
  * For more details see the README (or README.md) file.                        *
@@ -120,12 +120,12 @@ fmf_gtdpts (const char *const data_str, struct dp *head)
   if (cJSON_IsString (experiment_name)
       && (experiment_name->valuestring != NULL))
     {
-      printf ("Analysis of \"%s\":\n", experiment_name->valuestring);
+      printf ("\nResults of processing \"%s\"\n\n", experiment_name->valuestring);
     }
   data_points = cJSON_GetObjectItemCaseSensitive (data_json, "data_points");
   cJSON_ArrayForEach (data_point, data_points)
   {
-    cJSON *mins = cJSON_GetObjectItemCaseSensitive (data_point, "mins");
+    cJSON *mins = cJSON_GetObjectItemCaseSensitive (data_point, "minutes");
     cJSON *percentage = cJSON_GetObjectItemCaseSensitive
       (data_point, "percentage");
     if (cJSON_IsNumber (mins) && cJSON_IsNumber (percentage))
@@ -162,7 +162,7 @@ fmf_file2str (char *file_name)
       length = ftell (f);
       fseek (f, 0, SEEK_SET);
       int magic_value = 3; /* Be very careful about this!  */
-      buffer = malloc (length) + 3;
+      buffer = malloc (length + magic_value);
       if (buffer)
 	{
 	  fread (buffer, 1, length, f);

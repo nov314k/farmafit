@@ -29,7 +29,7 @@ There is no upper limit as to how many data points can be entered.
 
 Use ASCII characters only. Decimal point separator (.) must be used for rational numbers. Decimal comma separator (,) is not supported.
 
-Once experimental data is entered into `input.json` execute `./farmafit.exe` in the root directory. Results are displayed on the screen.
+Once experimental data is entered into `input.json` execute `./farmafit` in the root directory. Results are displayed on the screen.
 
 ## Sample input file
 
@@ -44,9 +44,12 @@ Here is the contents of a sample `input.json` file:
       { "minutes": 30,  "percentage": 11.935 },
       { "minutes": 45,  "percentage": 15.316 },
       { "minutes": 60,  "percentage": 19.195 },
-    
-      ...
-    
+      { "minutes": 90,  "percentage": 28.426 },
+      { "minutes": 120, "percentage": 35.830 },      
+      { "minutes": 150, "percentage": 41.672 },    
+      { "minutes": 180, "percentage": 49.569 },
+      { "minutes": 240, "percentage": 62.338 },
+      { "minutes": 300, "percentage": 72.883 },
       { "minutes": 360, "percentage": 79.588 }
   ]
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2019 Novak Petrovic                                           * 
- * dev2 <@> novak5 <.> 33mail <.> com                                          *
+ * <dev2[at]novak5[.]33mail[.]com>                                             *
  *                                                                             *
  * This file is part of Farmafit.                                              *
  * For more details see the README (or README.md) file.                        *
