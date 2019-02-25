@@ -1,0 +1,126 @@
+
+Results of processing "Experiment F1"
+
+Zero-order kinetics	k0 = 0.2220	rsq = 0.9839
+First-order kinetics	k1 = 0.0061	rsq = 0.8701
+Higuchi's equation	kh = 4.5271	rsq = 0.9661
+Peppas' equation	k  = 1.0022	rsq = 0.9905
+			n  = 0.7449
+
+
+Results of processing "Experiment F2"
+
+Zero-order kinetics	k0 = 0.1368	rsq = 0.9855
+First-order kinetics	k1 = 0.0064	rsq = 0.8651
+Higuchi's equation	kh = 2.7808	rsq = 0.9616
+Peppas' equation	k  = 0.4972	rsq = 0.9892
+			n  = 0.7816
+
+
+Results of processing "Experiment F3"
+
+Zero-order kinetics	k0 = 0.2149	rsq = 0.9470
+First-order kinetics	k1 = 0.0053	rsq = 0.8111
+Higuchi's equation	kh = 4.5128	rsq = 0.9863
+Peppas' equation	k  = 1.6202	rsq = 0.9892
+			n  = 0.6727
+
+
+Results of processing "Experiment F4"
+
+Zero-order kinetics	k0 = 0.1105	rsq = 0.9847
+First-order kinetics	k1 = 0.0061	rsq = 0.8883
+Higuchi's equation	kh = 2.2455	rsq = 0.9599
+Peppas' equation	k  = 0.5202	rsq = 0.9802
+			n  = 0.7334
+
+
+Results of processing "Experiment F5"
+
+Zero-order kinetics	k0 = 0.1306	rsq = 0.9853
+First-order kinetics	k1 = 0.0064	rsq = 0.8536
+Higuchi's equation	kh = 2.6586	rsq = 0.9649
+Peppas' equation	k  = 0.4730	rsq = 0.9936
+			n  = 0.7847
+
+
+Results of processing "Experiment F6"
+
+Zero-order kinetics	k0 = 0.2488	rsq = 0.9114
+First-order kinetics	k1 = 0.0058	rsq = 0.7393
+Higuchi's equation	kh = 5.2933	rsq = 0.9743
+Peppas' equation	k  = 1.2495	rsq = 0.9772
+			n  = 0.7539
+
+
+Results of processing "Experiment F7"
+
+Zero-order kinetics	k0 = 0.1540	rsq = 0.9719
+First-order kinetics	k1 = 0.0058	rsq = 0.8480
+Higuchi's equation	kh = 3.1789	rsq = 0.9776
+Peppas' equation	k  = 0.8634	rsq = 0.9913
+			n  = 0.7143
+
+
+Results of processing "Experiment F8"
+
+Zero-order kinetics	k0 = 0.0952	rsq = 0.9767
+First-order kinetics	k1 = 0.0055	rsq = 0.8845
+Higuchi's equation	kh = 1.9576	rsq = 0.9748
+Peppas' equation	k  = 0.6898	rsq = 0.9874
+			n  = 0.6650
+
+
+Results of processing "Experiment F9"
+
+Zero-order kinetics	k0 = 0.1694	rsq = 0.9776
+First-order kinetics	k1 = 0.0065	rsq = 0.8915
+Higuchi's equation	kh = 3.4224	rsq = 0.9422
+Peppas' equation	k  = 0.6161	rsq = 0.9607
+			n  = 0.7728
+
+
+Results of processing "Experiment F10"
+
+Zero-order kinetics	k0 = 0.1786	rsq = 0.9762
+First-order kinetics	k1 = 0.0064	rsq = 0.8599
+Higuchi's equation	kh = 3.6445	rsq = 0.9598
+Peppas' equation	k  = 0.6459	rsq = 0.9838
+			n  = 0.7835
+
+
+Results of processing "Experiment F11"
+
+Zero-order kinetics	k0 = 0.1697	rsq = 0.9824
+First-order kinetics	k1 = 0.0072	rsq = 0.8633
+Higuchi's equation	kh = 3.4203	rsq = 0.9427
+Peppas' equation	k  = 0.3653	rsq = 0.9774
+			n  = 0.8679
+
+
+Results of processing "Experiment F17"
+
+Zero-order kinetics	k0 = 0.2340	rsq = 0.8588
+First-order kinetics	k1 = 0.0047	rsq = 0.7051
+Higuchi's equation	kh = 5.1207	rsq = 0.9714
+Peppas' equation	k  = 2.5928	rsq = 0.9697
+			n  = 0.6276
+
+
+Results of processing "Experiment F18"
+
+Zero-order kinetics	k0 = 0.1714	rsq = 0.3841
+First-order kinetics	k1 = 0.0026	rsq = 0.2792
+Higuchi's equation	kh = 4.5032	rsq = 0.6261
+Peppas' equation	k  = 8.8023	rsq = 0.6333
+			n  = 0.4422
+
+
+Results of processing "Experiment F19"
+
+Zero-order kinetics	k0 = 0.1207	rsq = 0.9920
+First-order kinetics	k1 = 0.0062	rsq = 0.9291
+Higuchi's equation	kh = 2.4118	rsq = 0.9360
+Peppas' equation	k  = 0.6070	rsq = 0.9357
+			n  = 0.7080
+
