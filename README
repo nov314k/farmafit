@@ -1,5 +1,5 @@
 # Farmafit
-Extracts model parameters for modelling the release of pharmacological substances
+Extracts model parameters for modelling the release of pharmacological substances.
 
 ## Configuration
 
@@ -11,7 +11,7 @@ To compile, execute `make` in the root directory. See `Makefile` for further det
 
 ## Libraries
 
-cJSON, the ultraweight JSON parser,  (https://github.com/DaveGamble/cJSON)[https://github.com/DaveGamble/cJSON], is used to process the input JSON file. Since this is a simple project, `cJSON.h` and `cJSON.c` are just copied to `lib`, and included via Makefile.
+cJSON, the ultraweight JSON parser,  [github.com/DaveGamble/cJSON](https://github.com/DaveGamble/cJSON), is used to process the input JSON file. Since this is a simple project, `cJSON.h` and `cJSON.c` are just copied to `lib`, and included via `Makefile`.
 
 ## Usage
 
@@ -29,41 +29,42 @@ Use ASCII characters only. Decimal point separator (.) must be used for rational
 
 Once experimental data is entered into `input.json` execute `./farmafit.exe` in the root directory. Results are displayed on the screen.
 
-## Models
+## Models and Farmafit output
 
-Farmafit calculates parameters of the following models. In all equations __Q__ represents the percentage of the dissolved substance, and __t__ is time in minutes.
+Farmafit calculates parameters of the following models. In all equations `Q` represents the percentage of the dissolved substance, and `t` is time in minutes.
 
 For all models, r-squared `rsq` value is used to measure goodness of fit.
 
 ### Zero-order kinetics
 
-`Q = k0 * t`
+Model equation: `Q = k0 * t`
 
 Farmafit calculates `k0`.
 
 ### First-order kinetics
 
-`Q = (1 - exp (-k1 * t)) * 100`
+Model equation: `Q = (1 - exp (-k1 * t)) * 100`
 
 Farmafit calculates `k1`.
 
 ### Higuchi's equation
 
-`Q = kh * sqrt (t)`
+Model equation: `Q = kh * sqrt (t)`
 
 Farmafit calculates `kh`.
 
 ### Peppas' equation
 
-`Q = k * t^n`
+Model equation: `Q = k * t^n`
 
 Farmafit calculates `k` and `n`.
 
 ## Documentation
 
-See (doxygen/html/index.html)[doxygen/html/index.html] for source code documentation.
+See [doxygen/html/index.html](/doxygen/html/index.html) for source code documentation.
 
 ## Authors
 
-(Associate Professor Jelena Djuris)[http://www.ph.bg.ac.rs/en/about-us/associate-professors/1706/jelena-%C4%91uri%C5%A1-phd/]
-Novak Petrovic
+[Associate Professor Jelena Djuris](http://www.ph.bg.ac.rs/en/about-us/associate-professors/1706/jelena-%C4%91uri%C5%A1-phd/)
+
+[Novak Petrovic](https://github.com/novakpetrovic/)
