@@ -35,7 +35,7 @@ Once the experimental data is entered into the input file, execute `./farmafit f
 
 ### Example input file
 
-Here is the contents of the `example.json` file, which can be found in the _Farmafit_ root directory.
+Here is the content of the `example.json` file, which can be found in the _Farmafit_ root directory.
 
 ```
 { "experiment_name": "Experiment F1",

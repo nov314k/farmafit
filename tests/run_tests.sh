@@ -1,14 +1,32 @@
-../farmafit F01.json > out/F01.txt 
-../farmafit F02.json > out/F02.txt 
-../farmafit F03.json > out/F03.txt 
-../farmafit F04.json > out/F04.txt 
-../farmafit F05.json > out/F05.txt 
-../farmafit F06.json > out/F06.txt 
-../farmafit F07.json > out/F07.txt 
-../farmafit F08.json > out/F08.txt 
-../farmafit F09.json > out/F09.txt 
-../farmafit F10.json > out/F10.txt 
-../farmafit F11.json > out/F11.txt 
-../farmafit F17.json > out/F17.txt 
-../farmafit F18.json > out/F18.txt 
-../farmafit F19.json > out/F19.txt 
+./farmafit tests/F01.json > tests/out/F01.txt
+diff tests/out/F01.txt tests/sol/F01.txt
+./farmafit tests/F02.json > tests/out/F02.txt
+diff tests/out/F02.txt tests/sol/F02.txt
+./farmafit tests/F03.json > tests/out/F03.txt
+diff tests/out/F03.txt tests/sol/F03.txt
+./farmafit tests/F04.json > tests/out/F04.txt
+diff tests/out/F04.txt tests/sol/F04.txt
+./farmafit tests/F05.json > tests/out/F05.txt
+diff tests/out/F05.txt tests/sol/F05.txt
+./farmafit tests/F06.json > tests/out/F06.txt
+diff tests/out/F06.txt tests/sol/F06.txt
+./farmafit tests/F07.json > tests/out/F07.txt
+diff tests/out/F07.txt tests/sol/F07.txt
+./farmafit tests/F08.json > tests/out/F08.txt
+diff tests/out/F08.txt tests/sol/F08.txt
+./farmafit tests/F09.json > tests/out/F09.txt
+diff tests/out/F09.txt tests/sol/F09.txt
+./farmafit tests/F10.json > tests/out/F10.txt
+diff tests/out/F10.txt tests/sol/F10.txt
+./farmafit tests/F11.json > tests/out/F11.txt
+diff tests/out/F11.txt tests/sol/F11.txt
+./farmafit tests/F17.json > tests/out/F17.txt
+diff tests/out/F17.txt tests/sol/F17.txt
+./farmafit tests/F18.json > tests/out/F18.txt
+diff tests/out/F18.txt tests/sol/F18.txt
+./farmafit tests/F19.json > tests/out/F19.txt
+diff tests/out/F19.txt tests/sol/F19.txt
+
+
+
+

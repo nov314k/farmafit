@@ -1,0 +1,9 @@
+
+Results of processing "Experiment F5"
+
+Zero-order kinetics	k0 = 0.1306	rsq = 0.9853
+First-order kinetics	k1 = 0.0064	rsq = 0.8536
+Higuchi's equation	kh = 2.6586	rsq = 0.9649
+Peppas' equation	k  = 0.4730	rsq = 0.9936
+			n  = 0.7847
+
