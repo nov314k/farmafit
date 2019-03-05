@@ -1,0 +1,52 @@
+CC=gcc
+CFLAGS=
+GTKLIB=`pkg-config --cflags --libs gtk+-3.0`
+GLIB=`pkg-config --cflags --libs glib-2.0`
+GOBJECT=`pkg-config --cflags --libs gobject-2.0`
+
+OBJS=lib/slope/chart.o lib/slope/drawing.o lib/slope/figure.o lib/slope/item.o \
+lib/slope/legend.o lib/slope/sampler.o lib/slope/scale.o lib/slope/view.o lib/slope/xyaxis.o \
+lib/slope/xyscale.o lib/slope/xyseries.o
+
+INCLUDE=lib/slope/
+
+TARGET=widgets3
+
+$(TARGET): src/$(TARGET).c $(OBJS)
+	$(CC) $^ $(CFLAGS) $(GLIB) $(GTKLIB) -I$(INCLUDE) -o $@
+
+run: $(TARGET)
+	./$(TARGET).exe
+
+lib/slope/chart.o: lib/slope/chart.c
+	$(CC) -c lib/slope/chart.c $(CFLAGS) $(GTKLIB) -I$(INCLUDE) -o $@
+
+lib/slope/drawing.o: lib/slope/drawing.c
+	$(CC) -c lib/slope/drawing.c $(CFLAGS) $(GTKLIB) -I$(INCLUDE) -o $@
+
+lib/slope/figure.o: lib/slope/figure.c
+	$(CC) -c lib/slope/figure.c $(CFLAGS) $(GTKLIB) -I$(INCLUDE) -o $@
+
+lib/slope/item.o: lib/slope/item.c
+	$(CC) -c lib/slope/item.c $(CFLAGS) $(GTKLIB) -I$(INCLUDE) -o $@
+
+lib/slope/legend.o: lib/slope/legend.c
+	$(CC) -c lib/slope/legend.c $(CFLAGS) $(GTKLIB) -I$(INCLUDE) -o $@
+
+lib/slope/sampler.o: lib/slope/sampler.c
+	$(CC) -c lib/slope/sampler.c $(CFLAGS) $(GTKLIB) -I$(INCLUDE) -o $@
+
+lib/slope/scale.o: lib/slope/scale.c
+	$(CC) -c lib/slope/scale.c $(CFLAGS) $(GTKLIB) -I$(INCLUDE) -o $@
+
+lib/slope/view.o: lib/slope/view.c
+	$(CC) -c lib/slope/view.c $(CFLAGS) $(GTKLIB) -I$(INCLUDE) -o $@
+
+lib/slope/xyaxis.o: lib/slope/xyaxis.c
+	$(CC) -c lib/slope/xyaxis.c $(CFLAGS) $(GTKLIB) -I$(INCLUDE) -o $@
+
+lib/slope/xyscale.o: lib/slope/xyscale.c
+	$(CC) -c lib/slope/xyscale.c $(CFLAGS) $(GTKLIB) -I$(INCLUDE) -o $@
+
+lib/slope/xyseries.o: lib/slope/xyseries.c
+	$(CC) -c lib/slope/xyseries.c $(CFLAGS) $(GTKLIB) -I$(INCLUDE) -o $@

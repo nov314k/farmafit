@@ -1,4 +1,8 @@
 /*******************************************************************************
+Create a pull request for cplotlib
+Investigate DLLs neede to run this outside of MSYS2
+Investigate packing this tightly into a single file
+Investigate a neat Makefile that I can use for slope and submit
 Formulate a set of valid tests.
 Work out a testing system.
 Add a check that the input file is present.
