@@ -30,7 +30,7 @@
 #include "farmafit.h"
 #include "globdefs.h"
 #include "data_types.h"
-#include "../lib/cJSON.h"
+#include "../lib/cJSON/cJSON.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -67,8 +67,7 @@ fmf_variance (float *data, int size)
 }
 
 void
-fmf_linreg (float *independent, float *dependent, int size,
-		   struct lr *linreg)
+fmf_linreg (float *independent, float *dependent, int size, struct lr *linreg)
 {
   float independent_mean = fmf_armean (independent, size);
   float dependent_mean = fmf_armean (dependent, size);
@@ -120,7 +119,8 @@ fmf_gtdpts (const char *const data_str, struct dp *head)
   if (cJSON_IsString (experiment_name)
       && (experiment_name->valuestring != NULL))
     {
-      printf ("\nResults of processing \"%s\"\n\n", experiment_name->valuestring);
+      printf ("\nResults of processing \"%s\"\n\n",
+	      experiment_name->valuestring);
     }
   data_points = cJSON_GetObjectItemCaseSensitive (data_json, "data_points");
   cJSON_ArrayForEach (data_point, data_points)
@@ -161,7 +161,7 @@ fmf_file2str (char *file_name)
       fseek (f, 0, SEEK_END);
       length = ftell (f);
       fseek (f, 0, SEEK_SET);
-      int magic_value = 3; /* Be very careful about this!  */
+      int magic_value = 3;	/* Be very careful about this!  */
       buffer = malloc (length + magic_value);
       if (buffer)
 	{
@@ -205,8 +205,7 @@ fmf_calc_params (char *file_name)
       fmf_linreg (independent, dependent, data_points, linreg);
       printf ("Zero-order kinetics");
       printf ("\tk0 = %.4f", linreg->a);
-      printf ("\trsq = %.4f\n",
-	      fmf_rsq (independent, dependent, data_points));
+      printf ("\trsq = %.4f\n", fmf_rsq (independent, dependent, data_points));
       float x[data_points - 1];
       float y[data_points - 1];
       for (int i = 0; i < data_points - 1; i++)
@@ -215,7 +214,7 @@ fmf_calc_params (char *file_name)
 	  y[i] = log (dependent[i + 1]);
 	}
       fmf_linreg (x, y, data_points - 1, linreg);
-      printf ("First-order kinetics");      
+      printf ("First-order kinetics");
       printf ("\tk1 = %.4f", linreg->a);
       printf ("\trsq = %.4f\n", fmf_rsq (x, y, data_points - 1));
       float xx[data_points];

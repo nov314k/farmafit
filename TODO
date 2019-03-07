@@ -1,5 +1,5 @@
-/*******************************************************************************
-Create a pull request for cplotlib
+## Short-term todos
+
 Investigate DLLs neede to run this outside of MSYS2
 Investigate packing this tightly into a single file
 Investigate a neat Makefile that I can use for slope and submit
@@ -23,4 +23,6 @@ Change the types of linear_regression() arguments so there is no need
 for converting from a linked list of data points to two separate arrays.
 Or perhaps change the linear_regression functions to accept the linked
 list as the input so the calculations can be done from there.
-*******************************************************************************/
+
+## Long-term todos
+Consider using gtkdatabox

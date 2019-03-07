@@ -6,7 +6,7 @@ APP = farmafit
 EXAMPLE = example.json
 OBJECTS = farmafit.o main.o cJSON.o
 SOURCES = src/farmafit.c src/main.c 
-LIBRARIES = lib/cJSON.c
+LIBRARIES = lib/cJSON/cJSON.c
 
 $(APP): $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(APP)

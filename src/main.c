@@ -53,41 +53,41 @@ main (int argc, char **argv)
     {
       switch (c)
 	{
-	  case 'h':
-	    help_version ();
-	    exit (EXIT_SUCCESS);
-	    break;
-	  case 'v':
-	    help_version ();
-	    exit (EXIT_SUCCESS);
-	    break;
-	  case '?':
-	    help_version ();
-	    exit (EXIT_FAILURE);
-	    break;
-	  case ':':
-	    help_version ();
-	    exit (EXIT_FAILURE);
-	    break;
-	  case 'f':
-	    if (argc == 3)
-	      {
-		fmf_calc_params (optarg);
-		exit (EXIT_SUCCESS);
-	      }
-	    else
-	      {
-		fprintf (stderr, BASIC_ERROR_MESSAGE);
-		help_version ();
-		exit (EXIT_FAILURE);
-	      }
-	    break;
-	  default:
-	    fprintf (stderr, BASIC_ERROR_MESSAGE);
-	    help_version ();
-	    exit (EXIT_FAILURE);
-	    break;
-	}  
+	case 'h':
+	  help_version ();
+	  exit (EXIT_SUCCESS);
+	  break;
+	case 'v':
+	  help_version ();
+	  exit (EXIT_SUCCESS);
+	  break;
+	case '?':
+	  help_version ();
+	  exit (EXIT_FAILURE);
+	  break;
+	case ':':
+	  help_version ();
+	  exit (EXIT_FAILURE);
+	  break;
+	case 'f':
+	  if (argc == 3)
+	    {
+	      fmf_calc_params (optarg);
+	      exit (EXIT_SUCCESS);
+	    }
+	  else
+	    {
+	      fprintf (stderr, BASIC_ERROR_MESSAGE);
+	      help_version ();
+	      exit (EXIT_FAILURE);
+	    }
+	  break;
+	default:
+	  fprintf (stderr, BASIC_ERROR_MESSAGE);
+	  help_version ();
+	  exit (EXIT_FAILURE);
+	  break;
+	}
     }
   return EXIT_SUCCESS;
 }
@@ -100,4 +100,3 @@ help_version ()
   puts ("For further help and version information see README.md");
   return;
 }
-
