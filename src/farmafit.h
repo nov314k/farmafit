@@ -68,7 +68,7 @@ float fmf_variance (float *data, int size);
  * @param[in] dependent Dependent (y) coordinate of each data point
  * @param[in] size Number of data points
  * @param[out] linreg Pointer to lr (linear regression) struct to hold the result
- * @return Does not return anything
+ * @return void
  */
 void fmf_linreg (float *independent, float *dependent, int size,
 		 struct lr *linreg);
@@ -102,5 +102,12 @@ int fmf_gtdpts (const char *const data_str, struct dp *head);
  * @warning Be careful and investigate magic_value!
  */
 char *fmf_file2str (char *file_name);
+
+/**
+ * @brief Calculates all model parameters.
+ * @param[in] file_name Name of the experimental measurements file
+ * @return void
+ */
+void fmf_calc_params (char *file_name);
 
 #endif /* #ifndef FARMAFIT_H  */
