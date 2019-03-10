@@ -76,7 +76,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t00">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="input_purpose">number</property>
@@ -87,7 +87,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p00">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="input_purpose">number</property>
@@ -98,7 +98,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t01">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -108,7 +108,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p01">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -118,7 +118,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t02">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -128,7 +128,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p02">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -138,7 +138,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t03">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -148,7 +148,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p03">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -158,7 +158,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t04">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -168,7 +168,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p04">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -178,7 +178,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t05">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -188,7 +188,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p05">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -198,7 +198,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t06">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -208,7 +208,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p06">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -218,7 +218,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t07">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -228,7 +228,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p07">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -238,7 +238,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t08">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -248,7 +248,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p08">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -258,7 +258,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t09">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -268,7 +268,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p09">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -278,7 +278,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t10">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -288,7 +288,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p10">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -298,7 +298,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="t11">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -308,7 +308,7 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkEntry" id="p11">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -348,10 +348,10 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="k0">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">0.00</property>
+                <property name="label" translatable="yes">Not calculated</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -372,10 +372,10 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="rsq_k0">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">0.00</property>
+                <property name="label" translatable="yes">Not calculated</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -413,10 +413,10 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="k1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">0.00</property>
+                <property name="label" translatable="yes">Not calculated</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -437,10 +437,10 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="rsq_k1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">0.00</property>
+                <property name="label" translatable="yes">Not calculated</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -478,10 +478,10 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="kh">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">0.00</property>
+                <property name="label" translatable="yes">Not calculated</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -502,10 +502,10 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="rsq_kh">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">0.00</property>
+                <property name="label" translatable="yes">Not calculated</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -543,10 +543,10 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="k">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">0.00</property>
+                <property name="label" translatable="yes">Not calculated</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -559,7 +559,7 @@ Author: Novak Petrovic
                 <property name="can_focus">False</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
-                <property name="label" translatable="yes">n</property>
+                <property name="label" translatable="yes">tn</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -567,10 +567,10 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="n">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">0.00</property>
+                <property name="label" translatable="yes">Not calculated</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -591,10 +591,10 @@ Author: Novak Petrovic
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="rsq_k">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">0.00</property>
+                <property name="label" translatable="yes">Not calculated</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -756,7 +756,7 @@ Author: Novak Petrovic
                 <property name="can_focus">False</property>
                 <property name="homogeneous">True</property>
                 <child>
-                  <object class="GtkButton">
+                  <object class="GtkButton" id="btn_load_example">
                     <property name="label" translatable="yes">Load example</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -765,6 +765,7 @@ Author: Novak Petrovic
                     <property name="margin_right">10</property>
                     <property name="margin_top">4</property>
                     <property name="margin_bottom">4</property>
+                    <signal name="clicked" handler="on_btn_load_example_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -773,8 +774,8 @@ Author: Novak Petrovic
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton">
-                    <property name="label" translatable="yes">Calculate</property>
+                  <object class="GtkButton" id="btn_calculate_and_plot">
+                    <property name="label" translatable="yes">Calculate &amp; Plot</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -782,6 +783,7 @@ Author: Novak Petrovic
                     <property name="margin_right">10</property>
                     <property name="margin_top">4</property>
                     <property name="margin_bottom">4</property>
+                    <signal name="clicked" handler="on_btn_calculate_and_plot_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -790,8 +792,8 @@ Author: Novak Petrovic
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton">
-                    <property name="label" translatable="yes">Plot</property>
+                  <object class="GtkButton" id="btn_clear">
+                    <property name="label" translatable="yes">Clear</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -799,6 +801,7 @@ Author: Novak Petrovic
                     <property name="margin_right">10</property>
                     <property name="margin_top">4</property>
                     <property name="margin_bottom">4</property>
+                    <signal name="clicked" handler="on_btn_clear_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>

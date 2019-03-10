@@ -70,7 +70,7 @@ float fmf_variance (float *data, int size);
  * @param[out] linreg Pointer to lr (linear regression) struct to hold the result
  * @return void
  */
-void fmf_linreg (float *independent, float *dependent, int size,
+void fmf_calc_linreg (float *independent, float *dependent, int size,
 		 struct lr *linreg);
 
 /**
@@ -81,7 +81,7 @@ void fmf_linreg (float *independent, float *dependent, int size,
  * @param[in] size Number of data points
  * @return Value of r squared
  */
-float fmf_rsq (float *x, float *y, int size);
+float fmf_calc_rsq (float *x, float *y, int size);
 
 /**
  * @brief Gets data points.
@@ -94,20 +94,21 @@ float fmf_rsq (float *x, float *y, int size);
 int fmf_gtdpts (const char *const data_str, struct dp *head);
 
 /**
- * @brief Converts file contents to a string.
- * 
- * @param[in] file_name Name and path of the file to process
- * @return String which contains the contents of the file
- * @note Be careful and investigate magic_value!
- * @warning Be careful and investigate magic_value!
- */
-char *fmf_file2str (char *file_name);
-
-/**
- * @brief Calculates all model parameters.
+ * @brief Calculates all model parameters, including r-squared values
  * @param[in] file_name Name of the experimental measurements file
- * @return void
+ * @return Structure containing parameters for all models 
  */
-void fmf_calc_params (char *file_name);
+struct models_params fmf_calc_params (struct dp *data_set);
+
+/*
+ * @brief Prints all model parameters, includin r-squared values
+ * @param[in] file_name Name of the experimental measurements file
+ * @return void 
+ */
+void fmf_print_params (char *file_name);
+
+void fmf_init_data_set (struct dp *);
+
+void fmf_form_data_set (char *, struct dp *);
 
 #endif /* #ifndef FARMAFIT_H  */

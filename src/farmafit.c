@@ -27,9 +27,9 @@
  * @see farmafit.h for descriptions of parameters and return values.
  * @see README (or README.md) for more details.
  */
-#include "farmafit.h"
 #include "globdefs.h"
 #include "data_types.h"
+#include "farmafit.h"
 #include "../lib/cJSON/cJSON.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,20 +67,20 @@ fmf_variance (float *data, int size)
 }
 
 void
-fmf_linreg (float *independent, float *dependent, int size, struct lr *linreg)
+fmf_calc_linreg (float *independent, float *dependent, int size, struct lr *linreg)
 {
-  float independent_mean = fmf_armean (independent, size);
-  float dependent_mean = fmf_armean (dependent, size);
-  float products_mean = fmf_moprods (independent, dependent, size);
+  float independent_armean = fmf_armean (independent, size);
+  float dependent_armean = fmf_armean (dependent, size);
+  float mean_of_products = fmf_moprods (independent, dependent, size);
   float independent_variance = fmf_variance (independent, size);
   linreg->a =
-    (products_mean -
-     (independent_mean * dependent_mean)) / independent_variance;
-  linreg->b = dependent_mean - (linreg->a * independent_mean);
+    (mean_of_products -
+     independent_armean * dependent_armean) / independent_variance;
+  linreg->b = dependent_armean - (linreg->a * independent_armean);
 }
 
 float
-fmf_rsq (float *x, float *y, int size)
+fmf_calc_rsq (float *x, float *y, int size)
 {
   float x_mean = fmf_armean (x, size);
   float y_mean = fmf_armean (y, size);
@@ -150,10 +150,10 @@ fmf_gtdpts (const char *const data_str, struct dp *head)
   return EXIT_SUCCESS;
 }
 
-char *
-fmf_file2str (char *file_name)
+void
+fmf_file2str (char *file_name, char *data_str)
 {
-  char *buffer = 0;
+  *data_str = 0;
   long length;
   FILE *f = fopen (file_name, "rb");
   if (f)
@@ -162,82 +162,124 @@ fmf_file2str (char *file_name)
       length = ftell (f);
       fseek (f, 0, SEEK_SET);
       int magic_value = 3;	/* Be very careful about this!  */
-      buffer = malloc (length + magic_value);
-      if (buffer)
+      data_str = malloc (length + magic_value);
+      if (data_str)
 	{
-	  fread (buffer, 1, length, f);
+	  fread (data_str, 1, length, f);
 	}
       fclose (f);
     }
-  return buffer;
+  puts("aeiti");
+  return;
+}
+
+struct models_params
+fmf_calc_params (struct dp *data_set)
+{
+  int numof_data_points = 0;
+  struct dp *cur = data_set;
+  while (cur != NULL)
+    {
+      numof_data_points++;
+      cur = cur->next;
+    }
+  float independent[numof_data_points];
+  float dependent[numof_data_points];
+  int i = 0;
+  cur = data_set;
+  while (cur != NULL)
+    {
+      independent[i] = cur->mins;
+      dependent[i] = cur->perc;
+      i++;
+      cur = cur->next;
+    }
+  struct lr *linreg = (struct lr *) malloc (sizeof (struct lr));
+  fmf_calc_linreg (independent, dependent, numof_data_points, linreg);
+  struct models_params models_params;
+  models_params.k0 = linreg->a;
+  models_params.rsq_k0 = fmf_calc_rsq (independent, dependent, numof_data_points);
+  float x_axis_shorter[numof_data_points - 1];
+  float y_axis_shorter[numof_data_points - 1];
+  for (int i = 0; i < numof_data_points - 1; i++)
+    {
+      x_axis_shorter[i] = independent[i + 1];
+      y_axis_shorter[i] = log (dependent[i + 1]);
+    }
+  fmf_calc_linreg (x_axis_shorter, y_axis_shorter, numof_data_points - 1, linreg);
+  models_params.k1 = linreg->a;
+  models_params.rsq_k1 = fmf_calc_rsq (x_axis_shorter, y_axis_shorter,
+      numof_data_points - 1);
+  float x_axis[numof_data_points];
+  float y_axis[numof_data_points];
+  for (int i = 0; i < numof_data_points; i++)
+    {
+      x_axis[i] = sqrt (independent[i]);
+      y_axis[i] = dependent[i];
+    }
+  fmf_calc_linreg (x_axis, y_axis, numof_data_points, linreg);
+  models_params.kh = linreg->a;
+  models_params.rsq_kh = fmf_calc_rsq (x_axis, y_axis, numof_data_points);
+  for (int i = 0; i < numof_data_points - 1; i++)
+    {
+      x_axis_shorter[i] = log (independent[i + 1]);
+      y_axis_shorter[i] = log (dependent[i + 1]);
+    }
+  fmf_calc_linreg (x_axis_shorter, y_axis_shorter, numof_data_points - 1, linreg);
+  models_params.k = exp (linreg->b);
+  models_params.tn = linreg->a;
+  models_params.rsq_k = fmf_calc_rsq (x_axis_shorter, y_axis_shorter,
+      numof_data_points - 1);
+  return models_params;
+}
+
+void fmf_print_params (char *file_name)
+{
+  struct dp *data_set = (struct dp *) malloc (sizeof (struct dp));
+  fmf_init_data_set (data_set);
+  fmf_form_data_set (file_name, data_set);
+  struct models_params models_params = fmf_calc_params (data_set);
+  printf ("Zero-order kinetics");
+  printf ("\tk0 = %.4f", models_params.k0);
+  printf ("\trsq = %.4f\n", models_params.rsq_k0);
+  printf ("First-order kinetics");
+  printf ("\tk1 = %.4f", models_params.k1);
+  printf ("\trsq = %.4f\n", models_params.rsq_k1);
+  printf ("Higuchi's equation");
+  printf ("\tkh = %.4f", models_params.kh);
+  printf ("\trsq = %.4f\n", models_params.rsq_kh);
+  printf ("Peppas' equation");
+  printf ("\tk  = %.4f", models_params.k);
+  printf ("\trsq = %.4f\n", models_params.rsq_k);
+  printf ("\t\t\tn  = %.4f\n\n", models_params.tn);
 }
 
 void
-fmf_calc_params (char *file_name)
+fmf_init_data_set (struct dp *data_set)
 {
-  struct dp *head = (struct dp *) malloc (sizeof (struct dp));
-  head->mins = VALUE_NOT_SET;
-  head->perc = VALUE_NOT_SET;
-  head->next = NULL;
-  const char *const data_str = fmf_file2str (file_name);
-  int exit_status = fmf_gtdpts (data_str, head);
-  if (exit_status == EXIT_SUCCESS)
+  data_set->mins = VALUE_NOT_SET;
+  data_set->perc = VALUE_NOT_SET;
+  data_set->next = NULL;
+}
+
+void
+fmf_form_data_set (char *file_name, struct dp *data_set)
+{
+  char *data_str = 0;
+  long length;
+  FILE *f = fopen (file_name, "rb");
+  if (f)
     {
-      int data_points = 0;
-      struct dp *cur = head;
-      while (cur != NULL)
+      fseek (f, 0, SEEK_END);
+      length = ftell (f);
+      fseek (f, 0, SEEK_SET);
+      int magic_value = 0;	/* Be very careful about this!  */
+      data_str = malloc (length + magic_value);
+      if (data_str)
 	{
-	  data_points++;
-	  cur = cur->next;
+	  fread (data_str, 1, length, f);
 	}
-      float dependent[data_points];
-      float independent[data_points];
-      int i = 0;
-      cur = head;
-      while (cur != NULL)
-	{
-	  dependent[i] = cur->perc;
-	  independent[i] = cur->mins;
-	  i++;
-	  cur = cur->next;
-	}
-      struct lr *linreg = (struct lr *) malloc (sizeof (struct lr));
-      fmf_linreg (independent, dependent, data_points, linreg);
-      printf ("Zero-order kinetics");
-      printf ("\tk0 = %.4f", linreg->a);
-      printf ("\trsq = %.4f\n", fmf_rsq (independent, dependent, data_points));
-      float x[data_points - 1];
-      float y[data_points - 1];
-      for (int i = 0; i < data_points - 1; i++)
-	{
-	  x[i] = independent[i + 1];
-	  y[i] = log (dependent[i + 1]);
-	}
-      fmf_linreg (x, y, data_points - 1, linreg);
-      printf ("First-order kinetics");
-      printf ("\tk1 = %.4f", linreg->a);
-      printf ("\trsq = %.4f\n", fmf_rsq (x, y, data_points - 1));
-      float xx[data_points];
-      float yy[data_points];
-      for (int i = 0; i < data_points; i++)
-	{
-	  xx[i] = sqrt (independent[i]);
-	  yy[i] = dependent[i];
-	}
-      fmf_linreg (xx, yy, data_points, linreg);
-      printf ("Higuchi's equation");
-      printf ("\tkh = %.4f", linreg->a);
-      printf ("\trsq = %.4f\n", fmf_rsq (xx, yy, data_points));
-      for (int i = 0; i < data_points - 1; i++)
-	{
-	  x[i] = log (independent[i + 1]);
-	  y[i] = log (dependent[i + 1]);
-	}
-      fmf_linreg (x, y, data_points - 1, linreg);
-      printf ("Peppas' equation");
-      printf ("\tk  = %.4f", exp (linreg->b));
-      printf ("\trsq = %.4f\n", fmf_rsq (x, y, data_points - 1));
-      printf ("\t\t\tn  = %.4f\n\n", linreg->a);
+      fclose (f);
     }
-  return;
+  fmf_gtdpts (data_str, data_set);
 }

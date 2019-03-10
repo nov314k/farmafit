@@ -35,7 +35,8 @@
  * @param mins Elapsed minutes (independent variable).
  * @param perc Percentage of the substance dissolved (dependent variable).
  */
-struct dp {
+struct dp 
+{
   float mins;
   float perc;
   struct dp *next;
@@ -47,9 +48,36 @@ struct dp {
  * @param a Slope of the line.
  * @param b Intercept point.
  */
-struct lr {
+struct lr 
+{
   float a;
   float b;
+};
+
+/**
+ * @brief Data structure for the calculated parameters of all models.
+ *
+ * @param k0 Parameter for zero-order kinetics model
+ * @param k1 Parameter for first-order kinetics model
+ * @param kh Parameter for Higuchi's model
+ * @param k  Parameter (first) for Peppas' model
+ * @param tn Parameter (second) for Peppas' model
+ * @param rsq_k0 r-squared value for zero-order kinetics model
+ * @param rsq_k1 r-squared value for first-order kinetics model
+ * @param rsq_kh r-squared value for Higuchi's model
+ * @param rsq_k  r-squared value for Peppas' model
+ */
+struct models_params
+{
+  float k0;
+  float k1;
+  float kh;
+  float k;
+  float tn;
+  float rsq_k0;
+  float rsq_k1;
+  float rsq_kh;
+  float rsq_k;
 };
 
 #endif /* #ifndef DATA_TYPES_H  */
