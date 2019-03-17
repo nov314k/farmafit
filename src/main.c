@@ -36,6 +36,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/*
+ * TODO Change variable names to suit standard names
+ * TODO Process data from the input table, instead of reading it from the file
+ * TODO Clear up all warnings
+ * */
+
+
 #define NUMOF_PARAMETERS 9
 #define NUMOF_EXAMPLE_DATA_POINTS 12
 #define NUMOF_PLOT_POINTS 101
