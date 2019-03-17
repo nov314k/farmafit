@@ -636,7 +636,7 @@ Author: Novak Petrovic
                 <property name="can_focus">False</property>
                 <property name="homogeneous">True</property>
                 <child>
-                  <object class="GtkCheckButton">
+                  <object class="GtkCheckButton" id="tick_zo">
                     <property name="label" translatable="yes">Zero-order kinetics</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -644,6 +644,7 @@ Author: Novak Petrovic
                     <property name="margin_top">4</property>
                     <property name="margin_bottom">4</property>
                     <property name="draw_indicator">True</property>
+                    <signal name="toggled" handler="on_tick_zo_toggled" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -652,7 +653,7 @@ Author: Novak Petrovic
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkCheckButton">
+                  <object class="GtkCheckButton" id="tick_fo">
                     <property name="label" translatable="yes">First-order kinetics</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -660,6 +661,7 @@ Author: Novak Petrovic
                     <property name="margin_top">4</property>
                     <property name="margin_bottom">4</property>
                     <property name="draw_indicator">True</property>
+                    <signal name="toggled" handler="on_tick_fo_toggled" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -668,7 +670,7 @@ Author: Novak Petrovic
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkCheckButton">
+                  <object class="GtkCheckButton" id="tick_he">
                     <property name="label" translatable="yes">Higuchi's equation</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -676,6 +678,7 @@ Author: Novak Petrovic
                     <property name="margin_top">4</property>
                     <property name="margin_bottom">4</property>
                     <property name="draw_indicator">True</property>
+                    <signal name="toggled" handler="on_tick_he_toggled" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -684,7 +687,7 @@ Author: Novak Petrovic
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkCheckButton">
+                  <object class="GtkCheckButton" id="tick_pe">
                     <property name="label" translatable="yes">Peppas' equation	</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -692,6 +695,7 @@ Author: Novak Petrovic
                     <property name="margin_top">4</property>
                     <property name="margin_bottom">4</property>
                     <property name="draw_indicator">True</property>
+                    <signal name="toggled" handler="on_tick_pe_toggled" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>

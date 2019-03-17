@@ -36,7 +36,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-SlopeItem *series1;
+SlopeItem *series_zo;
+SlopeItem *series_fo;
+SlopeItem *series_he;
+SlopeItem *series_pe;
 SlopeScale *scale;
 GtkWidget *view;
 GtkWidget **example_t;
@@ -49,6 +52,11 @@ SlopeFigure *figure;
 SlopeItem *series;
 GtkWidget *g_lbl_hello;
 GtkWidget *g_lbl_count;
+GtkWidget *tick_zo;
+GtkWidget *tick_fo;
+GtkWidget *tick_he;
+GtkWidget *tick_pe;
+
 
 void help_version ();
 
@@ -104,61 +112,22 @@ G_MODULE_EXPORT on_btn_load_example_clicked ()
 void
 G_MODULE_EXPORT on_btn_clear_clicked ()
 {
-  gtk_entry_set_text (GTK_ENTRY(example_t[0]),"");
-  gtk_entry_set_text (GTK_ENTRY(example_t[1]),"");
-  gtk_entry_set_text (GTK_ENTRY(example_t[2]),"");
-  gtk_entry_set_text (GTK_ENTRY(example_t[3]),"");
-  gtk_entry_set_text (GTK_ENTRY(example_t[4]),"");
-  gtk_entry_set_text (GTK_ENTRY(example_t[5]),"");
-  gtk_entry_set_text (GTK_ENTRY(example_t[6]),"");
-  gtk_entry_set_text (GTK_ENTRY(example_t[7]),"");
-  gtk_entry_set_text (GTK_ENTRY(example_t[8]),"");
-  gtk_entry_set_text (GTK_ENTRY(example_t[9]),"");
-  gtk_entry_set_text (GTK_ENTRY(example_t[10]),"");
-  gtk_entry_set_text (GTK_ENTRY(example_t[11]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[0]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[1]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[2]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[3]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[4]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[5]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[6]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[7]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[8]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[9]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[10]),"");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[11]),"");  
-  gtk_label_set_text (GTK_LABEL(models_params[0]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[1]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[2]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[3]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[4]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[5]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[6]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[7]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[8]),"Not calculated");  
+  for (int i = 0; i < 12; ++i)
+  {
+    gtk_entry_set_text (GTK_ENTRY (example_t[i]),"");
+    gtk_entry_set_text (GTK_ENTRY (example_p[i]),"");  
+  }
+  for (int i = 0; i < 9; ++i)
+  {
+    gtk_label_set_text (GTK_LABEL (models_params[i]),"Not calculated");  
+  }
   slope_scale_remove_item (scale, series);
-  slope_scale_set_layout_rect(scale, -1, -1, -1, -1);
-  slope_view_redraw(SLOPE_VIEW(view));
-}
-
-void
-dummy_plot ()
-{
-  view = slope_view_new ();
-  SlopeFigure *figure = slope_figure_new ();
-  slope_view_set_figure (SLOPE_VIEW (view), figure);
-  scale = slope_xyscale_new();
-  slope_figure_add_scale (SLOPE_FIGURE (figure), scale);
-  slope_scale_set_layout_rect(scale, 0, 0, 1, 1);
-  //SlopeItem *series = slope_xyseries_new_filled ("Example data", example_t,
-  //    example_p, 12, "kor");
-  //slope_scale_add_item (scale, series);
-  //SlopeItem *x_axis;
-  //x_axis = slope_xyscale_get_axis(SLOPE_XYSCALE(scale), SLOPE_XYSCALE_AXIS_BOTTOM);
-  //SlopeSampler *x_sampler;
-  //x_sampler = slope_xyaxis_get_sampler(SLOPE_XYAXIS(x_axis));
-  //slope_sampler_set_samples(x_sampler, example_t_ticks, numof_examples);
+  slope_scale_set_layout_rect (scale, -1, -1, -1, -1);
+  slope_view_redraw(SLOPE_VIEW (view));
+  gtk_toggle_button_set_active (tick_zo, FALSE);
+  gtk_toggle_button_set_active (tick_fo, FALSE);
+  gtk_toggle_button_set_active (tick_he, FALSE);
+  gtk_toggle_button_set_active (tick_pe, FALSE);
 }
 
 void
@@ -192,15 +161,24 @@ test_on_btn_load_example_clicked ()
     {40.0, "40%"},  {50.0, "50%"},  {60.0, "60%"},  {70.0, "70%"},
     {80.0, "80%"},  {90.0, "90%"},  {100.0, "100%"}
   };
-  //view = slope_view_new ();
-  //SlopeFigure *figure = slope_figure_new ();
-  //slope_view_set_figure (SLOPE_VIEW (view), figure);
   scale = slope_xyscale_new();
   slope_figure_add_scale (SLOPE_FIGURE (figure), scale);
   slope_scale_set_layout_rect(scale, 0, 0, 1, 1);
-  series = slope_xyseries_new_filled ("Example data", example_t,
+  series = slope_xyseries_new_filled ("Measured data", example_t,
       example_p, 12, "kor");
   slope_scale_add_item (scale, series);
+  const long n = 101;
+  double *x11, *y11;
+  x11 = g_malloc (n * sizeof(double));
+  y11 = g_malloc (n * sizeof(double));
+  for (int k = 0; k < n; k++) {
+    x11[k] = (double) k * 360/100;
+    y11[k] = 1.022 * pow (x11[k], 0.7449);
+  }
+  series_zo = slope_xyseries_new_filled ("Zero-order kinetics", x11, y11, n, "b-");
+  series_fo = slope_xyseries_new_filled ("Zero-order kinetics", x11, y11, n, "b-");
+  series_he = slope_xyseries_new_filled ("Zero-order kinetics", x11, y11, n, "b-");
+  series_pe = slope_xyseries_new_filled ("Zero-order kinetics", x11, y11, n, "b-");
   SlopeItem *x_axis;
   x_axis = slope_xyscale_get_axis(SLOPE_XYSCALE(scale), SLOPE_XYSCALE_AXIS_BOTTOM);
   SlopeSampler *x_sampler;
@@ -216,9 +194,6 @@ G_MODULE_EXPORT on_btn_calculate_and_plot_clicked ()
   fmf_init_data_set (data_set);
   fmf_form_data_set ("example.json", data_set);
   struct models_params models_params_struct = fmf_calc_params (data_set);
-  //
-  //
-  //
   char number[10];
   snprintf(number, 10, "%.4f", models_params_struct.k0);
   gtk_label_set_text (GTK_LABEL(models_params[0]), number);
@@ -238,20 +213,48 @@ G_MODULE_EXPORT on_btn_calculate_and_plot_clicked ()
   gtk_label_set_text (GTK_LABEL(models_params[7]),number);
   snprintf(number, 10, "%.4f", models_params_struct.rsq_k);
   gtk_label_set_text (GTK_LABEL(models_params[8]),number);
-
   test_on_btn_load_example_clicked ();
-  //test_on_btn_load_example_clicked ();
-  //gtk_builder_add_from_file (builder, "farmafit.glade", NULL);
-  //box = GTK_WIDGET(gtk_builder_get_object(builder, "key_box"));
-
-  //gtk_box_pack_start (GTK_BOX (box), view, TRUE, TRUE, 0);
-  //scale = slope_xyscale_new ();
-  //slope_figure_add_scale (SLOPE_FIGURE (figure), scale);
-  //slope_scale_set_layout_rect (scale, 0, 0, 1, 1);
-  //gtk_widget_show (box);
-  //gtk_widget_show_all(window);                
 }
-  
+
+void
+G_MODULE_EXPORT on_tick_zo_toggled (GtkWidget *widget, gpointer data)
+{
+  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
+    slope_scale_remove_item (scale, series_zo);
+  else
+    slope_scale_add_item (scale, series_zo);
+  slope_view_redraw (SLOPE_VIEW (view));
+}
+
+void
+G_MODULE_EXPORT on_tick_fo_toggled (GtkWidget *widget, gpointer data)
+{
+  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
+    slope_scale_remove_item (scale, series_fo);
+  else
+    slope_scale_add_item (scale, series_fo);
+  slope_view_redraw (SLOPE_VIEW (view));
+}
+
+void
+G_MODULE_EXPORT on_tick_he_toggled (GtkWidget *widget, gpointer data)
+{
+  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
+    slope_scale_remove_item (scale, series_he);
+  else
+    slope_scale_add_item (scale, series_pe);
+  slope_view_redraw (SLOPE_VIEW (view));
+}
+
+void
+G_MODULE_EXPORT on_tick_pe_toggled (GtkWidget *widget, gpointer data)
+{
+  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
+    slope_scale_remove_item (scale, series_pe);
+  else
+    slope_scale_add_item (scale, series_pe);
+  slope_view_redraw (SLOPE_VIEW (view));
+}
 
 int gui_driver(int argc, char *argv[])
 {
@@ -260,57 +263,52 @@ int gui_driver(int argc, char *argv[])
   builder = gtk_builder_new();
   gtk_builder_add_from_file (builder, "farmafit.glade", NULL);
   box = GTK_WIDGET(gtk_builder_get_object(builder, "key_box"));
-  //test_on_btn_load_example_clicked ();
-  //dummy_plot ();
   view = slope_view_new ();
   figure = slope_figure_new ();
   slope_view_set_figure (SLOPE_VIEW (view), figure);
-  //scale = slope_xyscale_new();
-  //slope_figure_add_scale (SLOPE_FIGURE (figure), scale);
-  //slope_scale_set_layout_rect(scale, 0, 0, 1, 1);
   gtk_box_pack_start (GTK_BOX (box), view, TRUE, TRUE, 0);
   example_t = (GtkWidget *) g_malloc (12 * sizeof (GtkWidget *));
-  example_t[0] = GTK_WIDGET(gtk_builder_get_object (builder, "t00"));
-  example_t[1] = GTK_WIDGET(gtk_builder_get_object (builder, "t01"));
-  example_t[2] = GTK_WIDGET(gtk_builder_get_object (builder, "t02"));
-  example_t[3] = GTK_WIDGET(gtk_builder_get_object (builder, "t03"));
-  example_t[4] = GTK_WIDGET(gtk_builder_get_object (builder, "t04"));
-  example_t[5] = GTK_WIDGET(gtk_builder_get_object (builder, "t05"));
-  example_t[6] = GTK_WIDGET(gtk_builder_get_object (builder, "t06"));
-  example_t[7] = GTK_WIDGET(gtk_builder_get_object (builder, "t07"));
-  example_t[8] = GTK_WIDGET(gtk_builder_get_object (builder, "t08"));
-  example_t[9] = GTK_WIDGET(gtk_builder_get_object (builder, "t09"));
-  example_t[10] = GTK_WIDGET(gtk_builder_get_object (builder, "t10"));
-  example_t[11] = GTK_WIDGET(gtk_builder_get_object (builder, "t11"));
+  example_t[0] = GTK_WIDGET (gtk_builder_get_object (builder, "t00"));
+  example_t[1] = GTK_WIDGET (gtk_builder_get_object (builder, "t01"));
+  example_t[2] = GTK_WIDGET (gtk_builder_get_object (builder, "t02"));
+  example_t[3] = GTK_WIDGET (gtk_builder_get_object (builder, "t03"));
+  example_t[4] = GTK_WIDGET (gtk_builder_get_object (builder, "t04"));
+  example_t[5] = GTK_WIDGET (gtk_builder_get_object (builder, "t05"));
+  example_t[6] = GTK_WIDGET (gtk_builder_get_object (builder, "t06"));
+  example_t[7] = GTK_WIDGET (gtk_builder_get_object (builder, "t07"));
+  example_t[8] = GTK_WIDGET (gtk_builder_get_object (builder, "t08"));
+  example_t[9] = GTK_WIDGET (gtk_builder_get_object (builder, "t09"));
+  example_t[10] = GTK_WIDGET (gtk_builder_get_object (builder, "t10"));
+  example_t[11] = GTK_WIDGET (gtk_builder_get_object (builder, "t11"));
   example_p = (GtkWidget *) g_malloc (12 * sizeof (GtkWidget *));
-  example_p[0] = GTK_WIDGET(gtk_builder_get_object (builder, "p00"));
-  example_p[1] = GTK_WIDGET(gtk_builder_get_object (builder, "p01"));
-  example_p[2] = GTK_WIDGET(gtk_builder_get_object (builder, "p02"));
-  example_p[3] = GTK_WIDGET(gtk_builder_get_object (builder, "p03"));
-  example_p[4] = GTK_WIDGET(gtk_builder_get_object (builder, "p04"));
-  example_p[5] = GTK_WIDGET(gtk_builder_get_object (builder, "p05"));
-  example_p[6] = GTK_WIDGET(gtk_builder_get_object (builder, "p06"));
-  example_p[7] = GTK_WIDGET(gtk_builder_get_object (builder, "p07"));
-  example_p[8] = GTK_WIDGET(gtk_builder_get_object (builder, "p08"));
-  example_p[9] = GTK_WIDGET(gtk_builder_get_object (builder, "p09"));
-  example_p[10] = GTK_WIDGET(gtk_builder_get_object (builder, "p10"));
-  example_p[11] = GTK_WIDGET(gtk_builder_get_object (builder, "p11"));
+  example_p[0] = GTK_WIDGET (gtk_builder_get_object (builder, "p00"));
+  example_p[1] = GTK_WIDGET (gtk_builder_get_object (builder, "p01"));
+  example_p[2] = GTK_WIDGET (gtk_builder_get_object (builder, "p02"));
+  example_p[3] = GTK_WIDGET (gtk_builder_get_object (builder, "p03"));
+  example_p[4] = GTK_WIDGET (gtk_builder_get_object (builder, "p04"));
+  example_p[5] = GTK_WIDGET (gtk_builder_get_object (builder, "p05"));
+  example_p[6] = GTK_WIDGET (gtk_builder_get_object (builder, "p06"));
+  example_p[7] = GTK_WIDGET (gtk_builder_get_object (builder, "p07"));
+  example_p[8] = GTK_WIDGET (gtk_builder_get_object (builder, "p08"));
+  example_p[9] = GTK_WIDGET (gtk_builder_get_object (builder, "p09"));
+  example_p[10] = GTK_WIDGET (gtk_builder_get_object (builder, "p10"));
+  example_p[11] = GTK_WIDGET (gtk_builder_get_object (builder, "p11"));
   models_params = (GtkWidget *) g_malloc (9 * sizeof (GtkWidget *));
-  models_params[0] = GTK_WIDGET(gtk_builder_get_object (builder, "k0"));
-  models_params[1] = GTK_WIDGET(gtk_builder_get_object (builder, "rsq_k0"));
-  models_params[2] = GTK_WIDGET(gtk_builder_get_object (builder, "k1"));
-  models_params[3] = GTK_WIDGET(gtk_builder_get_object (builder, "rsq_k1"));
-  models_params[4] = GTK_WIDGET(gtk_builder_get_object (builder, "kh"));
-  models_params[5] = GTK_WIDGET(gtk_builder_get_object (builder, "rsq_kh"));
-  models_params[6] = GTK_WIDGET(gtk_builder_get_object (builder, "k"));
-  models_params[7] = GTK_WIDGET(gtk_builder_get_object (builder, "n"));
-  models_params[8] = GTK_WIDGET(gtk_builder_get_object (builder, "rsq_k"));
+  models_params[0] = GTK_WIDGET (gtk_builder_get_object (builder, "k0"));
+  models_params[1] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_k0"));
+  models_params[2] = GTK_WIDGET (gtk_builder_get_object (builder, "k1"));
+  models_params[3] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_k1"));
+  models_params[4] = GTK_WIDGET (gtk_builder_get_object (builder, "kh"));
+  models_params[5] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_kh"));
+  models_params[6] = GTK_WIDGET (gtk_builder_get_object (builder, "k"));
+  models_params[7] = GTK_WIDGET (gtk_builder_get_object (builder, "n"));
+  models_params[8] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_k"));
+  tick_zo = GTK_WIDGET (gtk_builder_get_object (builder, "tick_zo"));
   window = GTK_WIDGET(gtk_builder_get_object(builder, "top_window"));
   gtk_builder_connect_signals(builder, NULL);
   g_object_unref(builder);
   g_signal_connect (window, "delete_event", G_CALLBACK (gtk_main_quit), NULL);
   gtk_widget_show_all(window);                
-  //gtk_widget_hide (box);
   gtk_main();
   return 0;
 }
@@ -325,7 +323,7 @@ main (int argc, char **argv)
       exit (EXIT_FAILURE);
     }
   int c;
-  while ((c = getopt (argc, argv, "hvgf:")) != -1)
+  while ((c = getopt (argc, argv, ":hvgf:?")) != -1)
     {
       switch (c)
 	{
