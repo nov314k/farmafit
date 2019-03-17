@@ -36,156 +36,68 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-SlopeItem *series_zo;
-SlopeItem *series_fo;
-SlopeItem *series_he;
-SlopeItem *series_pe;
-SlopeScale *scale;
-GtkWidget *view;
-GtkWidget **example_t;
-GtkWidget **example_p;
-GtkWidget **models_params;
-GtkBuilder *builder; 
-GtkWidget *window;
-GtkWidget *box;
-SlopeFigure *figure;
-SlopeItem *series;
-GtkWidget *g_lbl_hello;
-GtkWidget *g_lbl_count;
-GtkWidget *tick_zo;
-GtkWidget *tick_fo;
-GtkWidget *tick_he;
-GtkWidget *tick_pe;
-
+#define NUMOF_PARAMETERS 9
+#define NUMOF_EXAMPLE_DATA_POINTS 12
+#define NUMOF_PLOT_POINTS 101
+#define NUMOF_LINES 4
+#define MSG_NOT_CALCULATED "Not calculated"
+#define BASE_10 10
+#define STR_LEN_FOR_CONVERSION 10
+#define LBL_MEASURED_DATA "Measured data"
+#define LBL_ZERO_ORDER_KINETICS "Zero-order kinetics"
+#define LBL_FIRST_ORDER_KINETICS "First-order kinetics"
+#define LBL_HIGUCHIS_EQUATION "Higuchi's equation"
+#define LBL_PEPPAS_EQUATION "Peppas' equation"
+static const double example_data_time_values[] =
+{
+  0, 15, 30, 45, 60, 90, 120, 150, 180, 240, 300, 360
+};
+static const double example_data_percentage_values[] =
+{
+  0, 8.803, 11.935, 15.316, 19.195, 28.426,
+  35.830, 41.672, 49.569, 62.338, 72.883, 79.588 
+};
+static const SlopeSample example_data_time_ticks[] = 
+{
+  {0.0, "0"},	  {15.0, "15"},   {30.0, "30"},   {45.0, "45"},
+  {60.0, "60"},   {90.0, "90"},   {120.0, "120"}, {150.0, "150"},
+  {180.0, "180"}, {240.0, "240"}, {300.0, "300"}, {360.0, "360"}
+};
+/* TODO Check if these are used at all?  */
+static const SlopeSample example_data_percentage_ticks[] = 
+{
+  {0.0, ""},	  {10.0, "10%"},  {20.0, "20%"},  {30.0, "30%"},
+  {40.0, "40%"},  {50.0, "50%"},  {60.0, "60%"},  {70.0, "70%"},
+  {80.0, "80%"},  {90.0, "90%"},  {100.0, "100%"}
+};
+static SlopeScale *scale;
+static SlopeFigure *figure;
+static SlopeItem *series_md;
+static SlopeItem *series_pe;
+static SlopeItem *series_zo;
+static SlopeItem *series_fo;
+static SlopeItem *series_he;
+static GtkWidget *box;
+static GtkWidget *view;
+static GtkWidget *window;
+static GtkWidget *tick_zo;
+static GtkWidget *tick_fo;
+static GtkWidget *tick_he;
+static GtkWidget *tick_pe;
+static GtkWidget **example_t;
+static GtkWidget **example_p;
+static GtkWidget **models_params;
+static GtkBuilder *builder;
+struct models_params models_params_struct;
 
 void help_version ();
-
-G_MODULE_EXPORT void on_btn_hello_clicked()
-{
-    static unsigned int count = 0;
-    char str_count[30] = {0};
-    
-    gtk_label_set_text(GTK_LABEL(g_lbl_hello), "Hello, world!");
-    count++;
-    sprintf(str_count, "%d", count);
-    gtk_label_set_text(GTK_LABEL(g_lbl_count), str_count);
-}
-
-void
-G_MODULE_EXPORT on_btn_load_example_clicked ()
-{
-  gtk_entry_set_text (GTK_ENTRY(example_t[0]),"0");
-  gtk_entry_set_text (GTK_ENTRY(example_t[1]),"15");
-  gtk_entry_set_text (GTK_ENTRY(example_t[2]),"30");
-  gtk_entry_set_text (GTK_ENTRY(example_t[3]),"45");
-  gtk_entry_set_text (GTK_ENTRY(example_t[4]),"60");
-  gtk_entry_set_text (GTK_ENTRY(example_t[5]),"90");
-  gtk_entry_set_text (GTK_ENTRY(example_t[6]),"120");
-  gtk_entry_set_text (GTK_ENTRY(example_t[7]),"150");
-  gtk_entry_set_text (GTK_ENTRY(example_t[8]),"180");
-  gtk_entry_set_text (GTK_ENTRY(example_t[9]),"240");
-  gtk_entry_set_text (GTK_ENTRY(example_t[10]),"300");
-  gtk_entry_set_text (GTK_ENTRY(example_t[11]),"360");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[0]),"0");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[1]),"8.803");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[2]),"11.935");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[3]),"15.316");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[4]),"19.195");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[5]),"28.426");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[6]),"35.830");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[7]),"41.672");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[8]),"49.569");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[9]),"62.338");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[10]),"72.883");  
-  gtk_entry_set_text (GTK_ENTRY(example_p[11]),"79.588");  
-  gtk_label_set_text (GTK_LABEL(models_params[0]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[1]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[2]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[3]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[4]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[5]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[6]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[7]),"Not calculated");  
-  gtk_label_set_text (GTK_LABEL(models_params[8]),"Not calculated");  
-}
-
-void
-G_MODULE_EXPORT on_btn_clear_clicked ()
-{
-  for (int i = 0; i < 12; ++i)
-  {
-    gtk_entry_set_text (GTK_ENTRY (example_t[i]),"");
-    gtk_entry_set_text (GTK_ENTRY (example_p[i]),"");  
-  }
-  for (int i = 0; i < 9; ++i)
-  {
-    gtk_label_set_text (GTK_LABEL (models_params[i]),"Not calculated");  
-  }
-  slope_scale_remove_item (scale, series);
-  slope_scale_set_layout_rect (scale, -1, -1, -1, -1);
-  slope_view_redraw(SLOPE_VIEW (view));
-  gtk_toggle_button_set_active (tick_zo, FALSE);
-  gtk_toggle_button_set_active (tick_fo, FALSE);
-  gtk_toggle_button_set_active (tick_he, FALSE);
-  gtk_toggle_button_set_active (tick_pe, FALSE);
-}
-
-void
-test_on_btn_load_example_clicked ()
-{
-  const int numof_examples = 12;
-  double *example_t = g_malloc (numof_examples * sizeof(double));
-  double *example_p = g_malloc (numof_examples * sizeof(double));
-  example_t[0]  = 0;	example_p[0]  = 0;
-  example_t[1]  = 15;	example_p[1]  = 8.803;
-  example_t[2]  = 30;	example_p[2]  = 11.935;
-  example_t[3]  = 45;	example_p[3]  = 15.316;
-  example_t[4]  = 60;	example_p[4]  = 19.195;
-  example_t[5]  = 90;	example_p[5]  = 28.426;
-  example_t[6]  = 120;	example_p[6]  = 35.830;	
-  example_t[7]  = 150;	example_p[7]  = 41.672;	
-  example_t[8]  = 180;	example_p[8]  = 49.569;
-  example_t[9]  = 240;	example_p[9]  = 62.338;
-  example_t[10] = 300;	example_p[10] = 72.883;
-  example_t[11] = 360;	example_p[11] = 79.588;
-  const int plot_points = 101;
-  const SlopeSample example_t_ticks[] = 
-  {
-    {0.0, "0"},	    {15.0, "15"},   {30.0, "30"},   {45.0, "45"},
-    {60.0, "60"},   {90.0, "90"},   {120.0, "120"}, {150.0, "150"},
-    {180.0, "180"}, {240.0, "240"}, {300.0, "300"}, {360.0, "360"}
-  };
-  const SlopeSample example_p_ticks[] = 
-  {
-    {0.0, ""},	    {10.0, "10%"},  {20.0, "20%"},  {30.0, "30%"},
-    {40.0, "40%"},  {50.0, "50%"},  {60.0, "60%"},  {70.0, "70%"},
-    {80.0, "80%"},  {90.0, "90%"},  {100.0, "100%"}
-  };
-  scale = slope_xyscale_new();
-  slope_figure_add_scale (SLOPE_FIGURE (figure), scale);
-  slope_scale_set_layout_rect(scale, 0, 0, 1, 1);
-  series = slope_xyseries_new_filled ("Measured data", example_t,
-      example_p, 12, "kor");
-  slope_scale_add_item (scale, series);
-  const long n = 101;
-  double *x11, *y11;
-  x11 = g_malloc (n * sizeof(double));
-  y11 = g_malloc (n * sizeof(double));
-  for (int k = 0; k < n; k++) {
-    x11[k] = (double) k * 360/100;
-    y11[k] = 1.022 * pow (x11[k], 0.7449);
-  }
-  series_zo = slope_xyseries_new_filled ("Zero-order kinetics", x11, y11, n, "b-");
-  series_fo = slope_xyseries_new_filled ("Zero-order kinetics", x11, y11, n, "b-");
-  series_he = slope_xyseries_new_filled ("Zero-order kinetics", x11, y11, n, "b-");
-  series_pe = slope_xyseries_new_filled ("Zero-order kinetics", x11, y11, n, "b-");
-  SlopeItem *x_axis;
-  x_axis = slope_xyscale_get_axis(SLOPE_XYSCALE(scale), SLOPE_XYSCALE_AXIS_BOTTOM);
-  SlopeSampler *x_sampler;
-  x_sampler = slope_xyaxis_get_sampler(SLOPE_XYAXIS(x_axis));
-  slope_sampler_set_samples(x_sampler, example_t_ticks, numof_examples);
-  slope_view_redraw(SLOPE_VIEW(view));
-}
+void G_MODULE_EXPORT on_btn_clear_clicked ();
+void G_MODULE_EXPORT on_tick_zo_toggled (GtkWidget *widget, gpointer data);
+void G_MODULE_EXPORT on_tick_fo_toggled (GtkWidget *widget, gpointer data);
+void G_MODULE_EXPORT on_tick_he_toggled (GtkWidget *widget, gpointer data);
+void G_MODULE_EXPORT on_tick_pe_toggled (GtkWidget *widget, gpointer data);
+void G_MODULE_EXPORT on_btn_load_example_clicked ();
+void generate_plots (int max_minutes);
 
 void
 G_MODULE_EXPORT on_btn_calculate_and_plot_clicked ()
@@ -193,67 +105,27 @@ G_MODULE_EXPORT on_btn_calculate_and_plot_clicked ()
   struct dp *data_set = (struct dp *) malloc (sizeof (struct dp));
   fmf_init_data_set (data_set);
   fmf_form_data_set ("example.json", data_set);
-  struct models_params models_params_struct = fmf_calc_params (data_set);
-  char number[10];
-  snprintf(number, 10, "%.4f", models_params_struct.k0);
+  models_params_struct = fmf_calc_params (data_set);
+  char number[STR_LEN_FOR_CONVERSION];
+  snprintf(number, BASE_10, "%.4f", models_params_struct.k0);
   gtk_label_set_text (GTK_LABEL(models_params[0]), number);
-  snprintf(number, 10, "%.4f", models_params_struct.rsq_k0);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_k0);
   gtk_label_set_text (GTK_LABEL(models_params[1]),number);  
-  snprintf(number, 10, "%.4f", models_params_struct.k1);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.k1);
   gtk_label_set_text (GTK_LABEL(models_params[2]),number);
-  snprintf(number, 10, "%.4f", models_params_struct.rsq_k1);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_k1);
   gtk_label_set_text (GTK_LABEL(models_params[3]),number);
-  snprintf(number, 10, "%.4f", models_params_struct.kh);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.kh);
   gtk_label_set_text (GTK_LABEL(models_params[4]),number);
-  snprintf(number, 10, "%.4f", models_params_struct.rsq_kh);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_kh);
   gtk_label_set_text (GTK_LABEL(models_params[5]),number);
-  snprintf(number, 10, "%.4f", models_params_struct.k);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.k);
   gtk_label_set_text (GTK_LABEL(models_params[6]),number);
-  snprintf(number, 10, "%.4f", models_params_struct.tn);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.tn);
   gtk_label_set_text (GTK_LABEL(models_params[7]),number);
-  snprintf(number, 10, "%.4f", models_params_struct.rsq_k);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_k);
   gtk_label_set_text (GTK_LABEL(models_params[8]),number);
-  test_on_btn_load_example_clicked ();
-}
-
-void
-G_MODULE_EXPORT on_tick_zo_toggled (GtkWidget *widget, gpointer data)
-{
-  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
-    slope_scale_remove_item (scale, series_zo);
-  else
-    slope_scale_add_item (scale, series_zo);
-  slope_view_redraw (SLOPE_VIEW (view));
-}
-
-void
-G_MODULE_EXPORT on_tick_fo_toggled (GtkWidget *widget, gpointer data)
-{
-  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
-    slope_scale_remove_item (scale, series_fo);
-  else
-    slope_scale_add_item (scale, series_fo);
-  slope_view_redraw (SLOPE_VIEW (view));
-}
-
-void
-G_MODULE_EXPORT on_tick_he_toggled (GtkWidget *widget, gpointer data)
-{
-  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
-    slope_scale_remove_item (scale, series_he);
-  else
-    slope_scale_add_item (scale, series_pe);
-  slope_view_redraw (SLOPE_VIEW (view));
-}
-
-void
-G_MODULE_EXPORT on_tick_pe_toggled (GtkWidget *widget, gpointer data)
-{
-  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
-    slope_scale_remove_item (scale, series_pe);
-  else
-    slope_scale_add_item (scale, series_pe);
-  slope_view_redraw (SLOPE_VIEW (view));
+  generate_plots (360);
 }
 
 int gui_driver(int argc, char *argv[])
@@ -304,6 +176,9 @@ int gui_driver(int argc, char *argv[])
   models_params[7] = GTK_WIDGET (gtk_builder_get_object (builder, "n"));
   models_params[8] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_k"));
   tick_zo = GTK_WIDGET (gtk_builder_get_object (builder, "tick_zo"));
+  tick_fo = GTK_WIDGET (gtk_builder_get_object (builder, "tick_fo"));
+  tick_he = GTK_WIDGET (gtk_builder_get_object (builder, "tick_he"));
+  tick_pe = GTK_WIDGET (gtk_builder_get_object (builder, "tick_pe"));
   window = GTK_WIDGET(gtk_builder_get_object(builder, "top_window"));
   gtk_builder_connect_signals(builder, NULL);
   g_object_unref(builder);
@@ -380,3 +255,142 @@ help_version ()
   puts ("For further help and version information see README.md");
   return;
 }
+
+void
+G_MODULE_EXPORT on_btn_clear_clicked ()
+{
+  for (int i = 0; i < NUMOF_EXAMPLE_DATA_POINTS; ++i)
+  {
+    gtk_entry_set_text (GTK_ENTRY (example_t[i]), "");
+    gtk_entry_set_text (GTK_ENTRY (example_p[i]), "");  
+  }
+  for (int i = 0; i < NUMOF_PARAMETERS; ++i)
+  {
+    gtk_label_set_text (GTK_LABEL (models_params[i]), MSG_NOT_CALCULATED);
+  }
+  slope_scale_remove_item (scale, series_md);
+  /* Four -1's are key to clearing the graph properly!  */
+  slope_scale_set_layout_rect (scale, -1, -1, -1, -1);
+  slope_view_redraw(SLOPE_VIEW (view));
+  gtk_toggle_button_set_active (tick_zo, FALSE);
+  gtk_toggle_button_set_active (tick_fo, FALSE);
+  gtk_toggle_button_set_active (tick_he, FALSE);
+  gtk_toggle_button_set_active (tick_pe, FALSE);
+}
+
+void
+G_MODULE_EXPORT on_tick_zo_toggled (GtkWidget *widget, gpointer data)
+{
+  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
+    slope_scale_remove_item (scale, series_zo);
+  else
+    slope_scale_add_item (scale, series_zo);
+  slope_view_redraw (SLOPE_VIEW (view));
+}
+
+void
+G_MODULE_EXPORT on_tick_fo_toggled (GtkWidget *widget, gpointer data)
+{
+  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
+    slope_scale_remove_item (scale, series_fo);
+  else
+    slope_scale_add_item (scale, series_fo);
+  slope_view_redraw (SLOPE_VIEW (view));
+}
+
+void
+G_MODULE_EXPORT on_tick_he_toggled (GtkWidget *widget, gpointer data)
+{
+  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
+    slope_scale_remove_item (scale, series_he);
+  else
+    slope_scale_add_item (scale, series_he);
+  slope_view_redraw (SLOPE_VIEW (view));
+}
+
+void
+G_MODULE_EXPORT on_tick_pe_toggled (GtkWidget *widget, gpointer data)
+{
+  if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
+    slope_scale_remove_item (scale, series_pe);
+  else
+    slope_scale_add_item (scale, series_pe);
+  slope_view_redraw (SLOPE_VIEW (view));
+}
+
+void
+G_MODULE_EXPORT on_btn_load_example_clicked ()
+{
+  char number_as_string[STR_LEN_FOR_CONVERSION];
+  for (int i = 0; i < NUMOF_EXAMPLE_DATA_POINTS; ++i)
+  {
+    snprintf(number_as_string, BASE_10, "%.0f", example_data_time_values[i]);
+    gtk_entry_set_text (GTK_ENTRY(example_t[i]), number_as_string);
+    snprintf(number_as_string, BASE_10, "%.3f", example_data_percentage_values[i]);
+    gtk_entry_set_text (GTK_ENTRY(example_p[i]), number_as_string);
+  }
+  for (int i = 0; i < NUMOF_PARAMETERS; ++i)
+  {
+    gtk_label_set_text (GTK_LABEL (models_params[i]), MSG_NOT_CALCULATED);
+  }
+}
+
+void
+generate_plots (int max_minutes)
+{
+  scale = slope_xyscale_new ();
+  slope_figure_add_scale (SLOPE_FIGURE (figure), scale);
+  slope_scale_set_layout_rect (scale, 0, 0, 1, 1);
+  /* Changing from 12 to 14 below does funny things.  */
+  series_md = slope_xyseries_new_filled (LBL_MEASURED_DATA, example_data_time_values, example_data_percentage_values, 12, "kor");
+  slope_scale_add_item (scale, series_md);
+  /* Zero-order kinetics  */
+  double *x_zo, *y_zo;
+  x_zo = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
+  y_zo = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
+  for (int i = 0; i < NUMOF_PLOT_POINTS; ++i) 
+  {
+    x_zo[i] = (double) i * max_minutes / (NUMOF_PLOT_POINTS - 1);
+    y_zo[i] = models_params_struct.k0 * x_zo[i];
+  }
+  series_zo = slope_xyseries_new_filled (LBL_ZERO_ORDER_KINETICS, x_zo, y_zo, NUMOF_PLOT_POINTS, "r-");
+  /* First-order kinetics  */
+  double *x_fo, *y_fo;
+  x_fo = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
+  y_fo = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
+  for (int i = 0; i < NUMOF_PLOT_POINTS; ++i) 
+  {
+    x_fo[i] = (double) i * max_minutes / (NUMOF_PLOT_POINTS - 1);
+    y_fo[i] = (1 - exp (-1 * models_params_struct.k1 * x_fo[i])) * 100;
+  }
+  series_fo = slope_xyseries_new_filled (LBL_FIRST_ORDER_KINETICS, x_fo, y_fo, NUMOF_PLOT_POINTS, "m-");
+  /* Higuchi's equation  */
+  double *x_he, *y_he;
+  x_he = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
+  y_he = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
+  for (int i = 0; i < NUMOF_PLOT_POINTS; ++i) 
+  {
+    x_he[i] = (double) i * max_minutes / (NUMOF_PLOT_POINTS - 1);
+    y_he[i] = models_params_struct.kh * sqrt (x_he[i]);
+  }
+  series_he = slope_xyseries_new_filled (LBL_HIGUCHIS_EQUATION, x_he, y_he, NUMOF_PLOT_POINTS, "g-");
+  /* Peppas' equation  */
+  double *x_pe, *y_pe;
+  x_pe = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
+  y_pe = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
+  for (int i = 0; i < NUMOF_PLOT_POINTS; ++i) 
+  {
+    x_pe[i] = (double) i * max_minutes / (NUMOF_PLOT_POINTS - 1);
+    y_pe[i] = models_params_struct.k * pow (x_pe[i], models_params_struct.tn);
+  }
+  series_pe = slope_xyseries_new_filled (LBL_PEPPAS_EQUATION, x_pe, y_pe, NUMOF_PLOT_POINTS, "b-");
+  /* Settin up the graph  */
+  SlopeItem *x_axis;
+  x_axis = slope_xyscale_get_axis (SLOPE_XYSCALE (scale), SLOPE_XYSCALE_AXIS_BOTTOM);
+  SlopeSampler *x_sampler;
+  x_sampler = slope_xyaxis_get_sampler (SLOPE_XYAXIS (x_axis));
+  slope_sampler_set_samples (x_sampler, example_data_time_ticks, NUMOF_EXAMPLE_DATA_POINTS);
+  slope_view_redraw (SLOPE_VIEW (view));
+}
+
+
