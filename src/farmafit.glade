@@ -27,6 +27,7 @@ Author: Novak Petrovic
   <!-- interface-name Farmafit -->
   <!-- interface-copyright (c) 2019 Novak Petrovic -->
   <!-- interface-authors Novak Petrovic -->
+  <object class="GtkEntryCompletion" id="entrycompletion1"/>
   <object class="GtkWindow" id="top_window">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Farmafit</property>
@@ -47,6 +48,7 @@ Author: Novak Petrovic
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Time in minutes, measured from the start of the experiment, when the measurement was taken. At the start of the experiment t = 0. Use only positive values, and decimal point separator.</property>
                 <property name="margin_top">4</property>
                 <property name="margin_bottom">4</property>
                 <property name="label" translatable="yes">Minutes</property>
@@ -63,6 +65,7 @@ Author: Novak Petrovic
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Measured value: percentage of the dissolved substance that you have measured. There is no need to enter the % sign in boxes below; enter 33.67 to record 33.67%. Use only positive values, and decimal point separator.</property>
                 <property name="margin_top">4</property>
                 <property name="margin_bottom">4</property>
                 <property name="label" translatable="yes">Percentage</property>
@@ -79,6 +82,9 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t00">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="tooltip_text" translatable="yes">We suggest you use t = 0 for the starting value, but change it to suit your needs.</property>
+                <property name="max_length">4</property>
+                <property name="placeholder_text" translatable="yes">0</property>
                 <property name="input_purpose">number</property>
               </object>
               <packing>
@@ -90,6 +96,8 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p00">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="tooltip_text" translatable="yes">We suggest you use p = 0 for the starting value, but change it to suit your needs.</property>
+                <property name="placeholder_text" translatable="yes">0</property>
                 <property name="input_purpose">number</property>
               </object>
               <packing>
@@ -101,6 +109,8 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t01">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_focus">True</property>
+                <property name="max_length">4</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -111,6 +121,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p01">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">6</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -121,6 +132,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t02">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">4</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -131,6 +143,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p02">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">6</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -141,6 +154,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t03">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">4</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -151,6 +165,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p03">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">6</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -161,6 +176,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t04">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">4</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -171,6 +187,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p04">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">6</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -181,6 +198,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t05">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">4</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -191,6 +209,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p05">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">6</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -201,6 +220,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t06">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">4</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -211,6 +231,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p06">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">6</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -221,6 +242,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t07">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">4</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -231,6 +253,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p07">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">6</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -241,6 +264,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t08">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">4</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -251,6 +275,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p08">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">6</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -261,6 +286,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t09">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">4</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -271,6 +297,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p09">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">6</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -281,6 +308,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t10">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">4</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -291,6 +319,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p10">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">6</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -301,6 +330,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t11">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">4</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -311,6 +341,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p11">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_length">6</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>

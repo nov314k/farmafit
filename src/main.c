@@ -32,6 +32,7 @@
 #include <slope/slope.h>
 #include <gtk/gtk.h>
 #include <unistd.h>
+#include <string.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -48,13 +49,16 @@
 #define NUMOF_PLOT_POINTS 101
 #define NUMOF_LINES 4
 #define MSG_NOT_CALCULATED "Not calculated"
+#define MSG_INCORRECT_ENTRY "ERROR: Incorrect entry!"
 #define BASE_10 10
-#define STR_LEN_FOR_CONVERSION 10
+#define STR_LEN_FOR_CONVERSION 6 
 #define LBL_MEASURED_DATA "Measured data"
 #define LBL_ZERO_ORDER_KINETICS "Zero-order kinetics"
 #define LBL_FIRST_ORDER_KINETICS "First-order kinetics"
 #define LBL_HIGUCHIS_EQUATION "Higuchi's equation"
 #define LBL_PEPPAS_EQUATION "Peppas' equation"
+#define GLADE_FILE_NAME "farmafit.glade"
+#define KEY_BOX "key_box"
 static const double example_data_time_values[] =
 {
   0, 15, 30, 45, 60, 90, 120, 150, 180, 240, 300, 360
@@ -71,12 +75,12 @@ static const SlopeSample example_data_time_ticks[] =
   {180.0, "180"}, {240.0, "240"}, {300.0, "300"}, {360.0, "360"}
 };
 /* TODO Check if these are used at all?  */
-static const SlopeSample example_data_percentage_ticks[] = 
-{
-  {0.0, ""},	  {10.0, "10%"},  {20.0, "20%"},  {30.0, "30%"},
-  {40.0, "40%"},  {50.0, "50%"},  {60.0, "60%"},  {70.0, "70%"},
-  {80.0, "80%"},  {90.0, "90%"},  {100.0, "100%"}
-};
+//static const SlopeSample example_data_percentage_ticks[] = 
+//{
+//  {0.0, ""},	  {10.0, "10%"},  {20.0, "20%"},  {30.0, "30%"},
+//  {40.0, "40%"},  {50.0, "50%"},  {60.0, "60%"},  {70.0, "70%"},
+//  {80.0, "80%"},  {90.0, "90%"},  {100.0, "100%"}
+//};
 static SlopeScale *scale;
 static SlopeFigure *figure;
 static SlopeItem *series_md;
@@ -105,93 +109,80 @@ void G_MODULE_EXPORT on_tick_he_toggled (GtkWidget *widget, gpointer data);
 void G_MODULE_EXPORT on_tick_pe_toggled (GtkWidget *widget, gpointer data);
 void G_MODULE_EXPORT on_btn_load_example_clicked ();
 void generate_plots (int max_minutes);
+void fill_out_labels ();
+void G_MODULE_EXPORT show_msg_box (char *);
+void load_io_widgets ();
+
+int
+correct_entry_digits_or_pt (char *entry)
+{
+  /* Return value: 0 = FALSE, 1 = TRUE  */
+  int all_good_flag = 1;
+  int numof_pts = 0;
+  size_t str_len = strlen (entry);
+  if (str_len == 0) return 0;
+  for (int i = 0; i < str_len; ++i)
+    if (entry[i] == '.') ++numof_pts;
+  if (numof_pts > 1) return 0;
+  for (int i = 0; i < str_len; ++i)
+    if (!(isdigit(entry[i]) || entry[i] == '.')) return 0;
+  return all_good_flag;
+}
 
 void
 G_MODULE_EXPORT on_btn_calculate_and_plot_clicked ()
 {
-  struct dp *data_set = (struct dp *) malloc (sizeof (struct dp));
+  struct dp *data_set = (struct dp *) g_malloc (sizeof (struct dp));
+  struct dp *data_set_aux = (struct dp *) g_malloc (sizeof (struct dp));
   fmf_init_data_set (data_set);
-  fmf_form_data_set ("example.json", data_set);
-  models_params_struct = fmf_calc_params (data_set);
-  char number[STR_LEN_FOR_CONVERSION];
-  snprintf(number, BASE_10, "%.4f", models_params_struct.k0);
-  gtk_label_set_text (GTK_LABEL(models_params[0]), number);
-  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_k0);
-  gtk_label_set_text (GTK_LABEL(models_params[1]),number);  
-  snprintf(number, BASE_10, "%.4f", models_params_struct.k1);
-  gtk_label_set_text (GTK_LABEL(models_params[2]),number);
-  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_k1);
-  gtk_label_set_text (GTK_LABEL(models_params[3]),number);
-  snprintf(number, BASE_10, "%.4f", models_params_struct.kh);
-  gtk_label_set_text (GTK_LABEL(models_params[4]),number);
-  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_kh);
-  gtk_label_set_text (GTK_LABEL(models_params[5]),number);
-  snprintf(number, BASE_10, "%.4f", models_params_struct.k);
-  gtk_label_set_text (GTK_LABEL(models_params[6]),number);
-  snprintf(number, BASE_10, "%.4f", models_params_struct.tn);
-  gtk_label_set_text (GTK_LABEL(models_params[7]),number);
-  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_k);
-  gtk_label_set_text (GTK_LABEL(models_params[8]),number);
-  generate_plots (360);
+  fmf_init_data_set (data_set_aux);
+  char number_as_string[STR_LEN_FOR_CONVERSION];
+  char *aux = (char *) g_malloc (STR_LEN_FOR_CONVERSION * sizeof (char));
+  /* t00  */
+  aux = gtk_entry_get_text (GTK_ENTRY (example_t[0]));
+  if (!correct_entry_digits_or_pt (aux))
+  {
+    show_msg_box (MSG_INCORRECT_ENTRY);
+    gtk_widget_grab_focus (example_t[0]);
+    return;
+  }
+  
+  // First work out how many data entries are there
+  // There must be at least 3 valid data points
+  // A valid data point is the one that has both entries non-zero and non-empty
+  // This is obviously not relevant to the first data point where both 
+  // values can be 0 (but cannot be emtpy)
+   
+  //fmf_form_data_set ("example.json", data_set);
+  //models_params_struct = fmf_calc_params (data_set);
+  //fill_out_labels ();
+  //generate_plots (360);
+  return;
 }
 
-int gui_driver(int argc, char *argv[])
+void gui_driver(int argc, char *argv[])
 {
-  puts ("GUI version starting...");
   gtk_init (&argc, &argv);
-  builder = gtk_builder_new();
-  gtk_builder_add_from_file (builder, "farmafit.glade", NULL);
-  box = GTK_WIDGET(gtk_builder_get_object(builder, "key_box"));
+  builder = gtk_builder_new ();
+  gtk_builder_add_from_file (builder, GLADE_FILE_NAME, NULL);
+  //
+  box = GTK_WIDGET (gtk_builder_get_object (builder, KEY_BOX)); 
+  //
   view = slope_view_new ();
   figure = slope_figure_new ();
   slope_view_set_figure (SLOPE_VIEW (view), figure);
+  //
   gtk_box_pack_start (GTK_BOX (box), view, TRUE, TRUE, 0);
-  example_t = (GtkWidget *) g_malloc (12 * sizeof (GtkWidget *));
-  example_t[0] = GTK_WIDGET (gtk_builder_get_object (builder, "t00"));
-  example_t[1] = GTK_WIDGET (gtk_builder_get_object (builder, "t01"));
-  example_t[2] = GTK_WIDGET (gtk_builder_get_object (builder, "t02"));
-  example_t[3] = GTK_WIDGET (gtk_builder_get_object (builder, "t03"));
-  example_t[4] = GTK_WIDGET (gtk_builder_get_object (builder, "t04"));
-  example_t[5] = GTK_WIDGET (gtk_builder_get_object (builder, "t05"));
-  example_t[6] = GTK_WIDGET (gtk_builder_get_object (builder, "t06"));
-  example_t[7] = GTK_WIDGET (gtk_builder_get_object (builder, "t07"));
-  example_t[8] = GTK_WIDGET (gtk_builder_get_object (builder, "t08"));
-  example_t[9] = GTK_WIDGET (gtk_builder_get_object (builder, "t09"));
-  example_t[10] = GTK_WIDGET (gtk_builder_get_object (builder, "t10"));
-  example_t[11] = GTK_WIDGET (gtk_builder_get_object (builder, "t11"));
-  example_p = (GtkWidget *) g_malloc (12 * sizeof (GtkWidget *));
-  example_p[0] = GTK_WIDGET (gtk_builder_get_object (builder, "p00"));
-  example_p[1] = GTK_WIDGET (gtk_builder_get_object (builder, "p01"));
-  example_p[2] = GTK_WIDGET (gtk_builder_get_object (builder, "p02"));
-  example_p[3] = GTK_WIDGET (gtk_builder_get_object (builder, "p03"));
-  example_p[4] = GTK_WIDGET (gtk_builder_get_object (builder, "p04"));
-  example_p[5] = GTK_WIDGET (gtk_builder_get_object (builder, "p05"));
-  example_p[6] = GTK_WIDGET (gtk_builder_get_object (builder, "p06"));
-  example_p[7] = GTK_WIDGET (gtk_builder_get_object (builder, "p07"));
-  example_p[8] = GTK_WIDGET (gtk_builder_get_object (builder, "p08"));
-  example_p[9] = GTK_WIDGET (gtk_builder_get_object (builder, "p09"));
-  example_p[10] = GTK_WIDGET (gtk_builder_get_object (builder, "p10"));
-  example_p[11] = GTK_WIDGET (gtk_builder_get_object (builder, "p11"));
-  models_params = (GtkWidget *) g_malloc (9 * sizeof (GtkWidget *));
-  models_params[0] = GTK_WIDGET (gtk_builder_get_object (builder, "k0"));
-  models_params[1] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_k0"));
-  models_params[2] = GTK_WIDGET (gtk_builder_get_object (builder, "k1"));
-  models_params[3] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_k1"));
-  models_params[4] = GTK_WIDGET (gtk_builder_get_object (builder, "kh"));
-  models_params[5] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_kh"));
-  models_params[6] = GTK_WIDGET (gtk_builder_get_object (builder, "k"));
-  models_params[7] = GTK_WIDGET (gtk_builder_get_object (builder, "n"));
-  models_params[8] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_k"));
-  tick_zo = GTK_WIDGET (gtk_builder_get_object (builder, "tick_zo"));
-  tick_fo = GTK_WIDGET (gtk_builder_get_object (builder, "tick_fo"));
-  tick_he = GTK_WIDGET (gtk_builder_get_object (builder, "tick_he"));
-  tick_pe = GTK_WIDGET (gtk_builder_get_object (builder, "tick_pe"));
-  window = GTK_WIDGET(gtk_builder_get_object(builder, "top_window"));
-  gtk_builder_connect_signals(builder, NULL);
-  g_object_unref(builder);
+  //
+  window = GTK_WIDGET (gtk_builder_get_object (builder, "top_window"));
+  //
+  load_io_widgets ();
+  //
+  gtk_builder_connect_signals (builder, NULL);
+  g_object_unref (builder);
   g_signal_connect (window, "delete_event", G_CALLBACK (gtk_main_quit), NULL);
-  gtk_widget_show_all(window);                
-  gtk_main();
+  gtk_widget_show_all (window);                
+  gtk_main ();
   return 0;
 }
 
@@ -271,18 +262,22 @@ G_MODULE_EXPORT on_btn_clear_clicked ()
     gtk_entry_set_text (GTK_ENTRY (example_t[i]), "");
     gtk_entry_set_text (GTK_ENTRY (example_p[i]), "");  
   }
+  gtk_entry_set_text (GTK_ENTRY (example_t[0]), "0");
+  gtk_entry_set_text (GTK_ENTRY (example_p[0]), "0");
   for (int i = 0; i < NUMOF_PARAMETERS; ++i)
   {
     gtk_label_set_text (GTK_LABEL (models_params[i]), MSG_NOT_CALCULATED);
   }
-  slope_scale_remove_item (scale, series_md);
+  // TODO Add a check here to see if the plot has been generated
+  //slope_scale_remove_item (scale, series_md);
   /* Four -1's are key to clearing the graph properly!  */
-  slope_scale_set_layout_rect (scale, -1, -1, -1, -1);
-  slope_view_redraw(SLOPE_VIEW (view));
+  //slope_scale_set_layout_rect (scale, -1, -1, -1, -1);
+  //slope_view_redraw(SLOPE_VIEW (view));
   gtk_toggle_button_set_active (tick_zo, FALSE);
   gtk_toggle_button_set_active (tick_fo, FALSE);
   gtk_toggle_button_set_active (tick_he, FALSE);
   gtk_toggle_button_set_active (tick_pe, FALSE);
+  return;
 }
 
 void
@@ -293,6 +288,7 @@ G_MODULE_EXPORT on_tick_zo_toggled (GtkWidget *widget, gpointer data)
   else
     slope_scale_add_item (scale, series_zo);
   slope_view_redraw (SLOPE_VIEW (view));
+  return;
 }
 
 void
@@ -303,6 +299,7 @@ G_MODULE_EXPORT on_tick_fo_toggled (GtkWidget *widget, gpointer data)
   else
     slope_scale_add_item (scale, series_fo);
   slope_view_redraw (SLOPE_VIEW (view));
+  return;
 }
 
 void
@@ -313,6 +310,7 @@ G_MODULE_EXPORT on_tick_he_toggled (GtkWidget *widget, gpointer data)
   else
     slope_scale_add_item (scale, series_he);
   slope_view_redraw (SLOPE_VIEW (view));
+  return;
 }
 
 void
@@ -323,6 +321,7 @@ G_MODULE_EXPORT on_tick_pe_toggled (GtkWidget *widget, gpointer data)
   else
     slope_scale_add_item (scale, series_pe);
   slope_view_redraw (SLOPE_VIEW (view));
+  return;
 }
 
 void
@@ -340,6 +339,7 @@ G_MODULE_EXPORT on_btn_load_example_clicked ()
   {
     gtk_label_set_text (GTK_LABEL (models_params[i]), MSG_NOT_CALCULATED);
   }
+  return;
 }
 
 void
@@ -391,13 +391,104 @@ generate_plots (int max_minutes)
     y_pe[i] = models_params_struct.k * pow (x_pe[i], models_params_struct.tn);
   }
   series_pe = slope_xyseries_new_filled (LBL_PEPPAS_EQUATION, x_pe, y_pe, NUMOF_PLOT_POINTS, "b-");
-  /* Settin up the graph  */
+  /* Setting up the graph  */
   SlopeItem *x_axis;
   x_axis = slope_xyscale_get_axis (SLOPE_XYSCALE (scale), SLOPE_XYSCALE_AXIS_BOTTOM);
   SlopeSampler *x_sampler;
   x_sampler = slope_xyaxis_get_sampler (SLOPE_XYAXIS (x_axis));
   slope_sampler_set_samples (x_sampler, example_data_time_ticks, NUMOF_EXAMPLE_DATA_POINTS);
   slope_view_redraw (SLOPE_VIEW (view));
+  return;
 }
 
+void
+fill_out_labels ()
+{
+  char number[STR_LEN_FOR_CONVERSION];
+  snprintf(number, BASE_10, "%.4f", models_params_struct.k0);
+  gtk_label_set_text (GTK_LABEL(models_params[0]), number);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_k0);
+  gtk_label_set_text (GTK_LABEL(models_params[1]),number);  
+  snprintf(number, BASE_10, "%.4f", models_params_struct.k1);
+  gtk_label_set_text (GTK_LABEL(models_params[2]),number);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_k1);
+  gtk_label_set_text (GTK_LABEL(models_params[3]),number);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.kh);
+  gtk_label_set_text (GTK_LABEL(models_params[4]),number);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_kh);
+  gtk_label_set_text (GTK_LABEL(models_params[5]),number);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.k);
+  gtk_label_set_text (GTK_LABEL(models_params[6]),number);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.tn);
+  gtk_label_set_text (GTK_LABEL(models_params[7]),number);
+  snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_k);
+  gtk_label_set_text (GTK_LABEL(models_params[8]),number);
+  return;
+}
+
+void
+G_MODULE_EXPORT show_msg_box (char *msg_text)
+{
+  GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+  GtkDialog *dialog;
+  dialog = gtk_message_dialog_new (window,
+				   flags,
+				   GTK_MESSAGE_ERROR,
+				   GTK_BUTTONS_CLOSE,
+				   "%s",
+				   msg_text);
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+}
+
+void
+load_io_widgets ()
+{
+  example_t = (GtkWidget *) g_malloc (NUMOF_EXAMPLE_DATA_POINTS * sizeof (GtkWidget *));
+  example_t[0] = GTK_WIDGET (gtk_builder_get_object (builder, "t00"));
+  example_t[1] = GTK_WIDGET (gtk_builder_get_object (builder, "t01"));
+  example_t[2] = GTK_WIDGET (gtk_builder_get_object (builder, "t02"));
+  example_t[3] = GTK_WIDGET (gtk_builder_get_object (builder, "t03"));
+  example_t[4] = GTK_WIDGET (gtk_builder_get_object (builder, "t04"));
+  example_t[5] = GTK_WIDGET (gtk_builder_get_object (builder, "t05"));
+  example_t[6] = GTK_WIDGET (gtk_builder_get_object (builder, "t06"));
+  example_t[7] = GTK_WIDGET (gtk_builder_get_object (builder, "t07"));
+  example_t[8] = GTK_WIDGET (gtk_builder_get_object (builder, "t08"));
+  example_t[9] = GTK_WIDGET (gtk_builder_get_object (builder, "t09"));
+  example_t[10] = GTK_WIDGET (gtk_builder_get_object (builder, "t10"));
+  example_t[11] = GTK_WIDGET (gtk_builder_get_object (builder, "t11"));
+  example_p = (GtkWidget *) g_malloc (NUMOF_EXAMPLE_DATA_POINTS * sizeof (GtkWidget *));
+  example_p[0] = GTK_WIDGET (gtk_builder_get_object (builder, "p00"));
+  example_p[1] = GTK_WIDGET (gtk_builder_get_object (builder, "p01"));
+  example_p[2] = GTK_WIDGET (gtk_builder_get_object (builder, "p02"));
+  example_p[3] = GTK_WIDGET (gtk_builder_get_object (builder, "p03"));
+  example_p[4] = GTK_WIDGET (gtk_builder_get_object (builder, "p04"));
+  example_p[5] = GTK_WIDGET (gtk_builder_get_object (builder, "p05"));
+  example_p[6] = GTK_WIDGET (gtk_builder_get_object (builder, "p06"));
+  example_p[7] = GTK_WIDGET (gtk_builder_get_object (builder, "p07"));
+  example_p[8] = GTK_WIDGET (gtk_builder_get_object (builder, "p08"));
+  example_p[9] = GTK_WIDGET (gtk_builder_get_object (builder, "p09"));
+  example_p[10] = GTK_WIDGET (gtk_builder_get_object (builder, "p10"));
+  example_p[11] = GTK_WIDGET (gtk_builder_get_object (builder, "p11"));
+  gtk_entry_set_text (GTK_ENTRY (example_t[0]), "0");
+  gtk_entry_set_text (GTK_ENTRY (example_p[0]), "0");
+  models_params = (GtkWidget *) g_malloc (NUMOF_PARAMETERS * sizeof (GtkWidget *));
+  models_params[0] = GTK_WIDGET (gtk_builder_get_object (builder, "k0"));
+  models_params[1] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_k0"));
+  models_params[2] = GTK_WIDGET (gtk_builder_get_object (builder, "k1"));
+  models_params[3] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_k1"));
+  models_params[4] = GTK_WIDGET (gtk_builder_get_object (builder, "kh"));
+  models_params[5] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_kh"));
+  models_params[6] = GTK_WIDGET (gtk_builder_get_object (builder, "k"));
+  models_params[7] = GTK_WIDGET (gtk_builder_get_object (builder, "n"));
+  models_params[8] = GTK_WIDGET (gtk_builder_get_object (builder, "rsq_k"));
+  tick_zo = (GtkWidget *) g_malloc (sizeof (GtkWidget *));
+  tick_zo = GTK_WIDGET (gtk_builder_get_object (builder, "tick_zo"));
+  tick_fo = (GtkWidget *) g_malloc (sizeof (GtkWidget *));
+  tick_fo = GTK_WIDGET (gtk_builder_get_object (builder, "tick_fo"));
+  tick_he = (GtkWidget *) g_malloc (sizeof (GtkWidget *));
+  tick_he = GTK_WIDGET (gtk_builder_get_object (builder, "tick_he"));
+  tick_pe = (GtkWidget *) g_malloc (sizeof (GtkWidget *));
+  tick_pe = GTK_WIDGET (gtk_builder_get_object (builder, "tick_pe"));
+}
 
