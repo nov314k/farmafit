@@ -5,27 +5,30 @@ CC = gcc
 CFLAGS = -std=c99
 APP = farmafit
 EXAMPLE = example.json
-OBJECTS = farmafit.o main.o cJSON.o
-SOURCES = src/farmafit.c src/main.c 
-LIBRARIES = lib/cJSON/cJSON.c
+OBJECTS = farmafit.o main.o
+SOURCES = src/farmafit.c src/main.c
 GTKLIB=`pkg-config --cflags --libs gtk+-3.0`
 
 SLOPELIB = \
--I/home/novak/dev/lib/slope/20190309/slope/slope/include \
--I/home/novak/dev/lib/slope/20190309/slope/slope/source \
+-I/home/novak/dev/lib/slope/20190309/slope/slope/include/ \
+-I/home/novak/dev/lib/slope/20190309/slope/slope/source/ \
 -L/home/novak/dev/lib/slope/20190309 \
 -lslope
 
+cJSONLIB = \
+-I/home/novak/dev/lib/cJSON/20190223/cJSON/ \
+-L/home/novak/dev/lib/cJSON/20190223/ \
+-lcJSON
 
 default: $(APP)
 
 all: $(APP)
 
 $(APP): $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) $(SLOPELIB) $(GTKLIB) -o $(APP)
+	$(CC) $(CFLAGS) $(OBJECTS) $(cJSONLIB) $(SLOPELIB) $(GTKLIB) -o $(APP)
 
 $(OBJECTS): $(SOURCES)
-	$(CC) $(CFLAGS) -c $(SOURCES) $(LIBRARIES) $(SLOPELIB) $(GTKLIB)
+	$(CC) $(CFLAGS) -c $(SOURCES) $(cJSONLIB) $(SLOPELIB) $(GTKLIB)
 
 .PHONY: indent example test clean
 

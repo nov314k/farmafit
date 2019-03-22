@@ -5,7 +5,7 @@ _Farmafit_ extracts model parameters for modelling the release of pharmacologica
 
 ## Configuration
 
-All development and testing was done on Cygwin. No special configuration provisions are needed.
+All development and testing was done on MSYS2. No special configuration provisions are needed.
 
 ## Compiling
 
@@ -13,7 +13,9 @@ To compile, execute `make` in the root directory. See `Makefile` for further det
 
 ## Libraries
 
-cJSON, the ultraweight JSON parser,  [github.com/DaveGamble/cJSON](https://github.com/DaveGamble/cJSON), is used to process the input JSON file. Since this is a simple project, `cJSON.h` and `cJSON.c` are just copied to `lib`, and included via `Makefile`.
+_cJSON_, the ultraweight JSON parser, [github.com/DaveGamble/cJSON](https://github.com/DaveGamble/cJSON), is used to process the input JSON file.
+
+_Slope_, the C/GTK+ data visualization library, [github.com/bytebrew/slope](https://github.com/bytebrew/slope), is used for plotting in the GUI version.
 
 ## Usage
 
@@ -31,7 +33,7 @@ There is no upper limit as to how many data points can be entered.
 
 Use ASCII characters only. Decimal point separator (.) must be used for rational numbers. Decimal comma separator (,) is not supported.
 
-Once the experimental data is entered into the input file, execute `./farmafit file_name`, where `file_name` is the name of the input file. Relative and absolute paths can be used. Once the input file is processed, _Farmafit_ displays the results on the screen.
+Once the experimental data is entered into the input file, execute `./farmafit -f file_name`, where `file_name` is the name of the input file. Note that the `-f` switch must be used. Relative and absolute paths can be used. Once the input file is processed, _Farmafit_ displays the results on the screen.
 
 ### Example input file
 
@@ -59,7 +61,7 @@ Here is the content of the `example.json` file, which can be found in the _Farma
 
 ### Example output
 
-The following is displayed on the screed after running `./farmafit example.json`:
+The following is displayed on the screed after running `./farmafit -f example.json`:
 
 ```
 Results of processing "Experiment F1"
