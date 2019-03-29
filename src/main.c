@@ -57,7 +57,7 @@
 #define MSG_INCORRECT_ENTRY "ERROR: Incorrect entry!"
 #define MSG_INSUFF_DATA_POINTS "ERROR: Enter at least 3 valid data points."
 #define BASE_10 10
-#define STR_LEN_FOR_CONVERSION 6 
+#define STR_LEN_FOR_CONVERSION 6
 #define LBL_MEASURED_DATA "Measured data"
 #define LBL_ZERO_ORDER_KINETICS "Zero-order kinetics"
 #define LBL_FIRST_ORDER_KINETICS "First-order kinetics"
@@ -72,14 +72,14 @@ static const double example_data_time_values[] =
 static const double example_data_percentage_values[] =
 {
   0, 8.803, 11.935, 15.316, 19.195, 28.426,
-  35.830, 41.672, 49.569, 62.338, 72.883, 79.588 
+  35.830, 41.672, 49.569, 62.338, 72.883, 79.588
 };
-static const SlopeSample example_data_time_ticks[] = 
-{
-  {0.0, "0"},	  {15.0, "15"},   {30.0, "30"},   {45.0, "45"},
-  {60.0, "60"},   {90.0, "90"},   {120.0, "120"}, {150.0, "150"},
-  {180.0, "180"}, {240.0, "240"}, {300.0, "300"}, {360.0, "360"}
-};
+//static const SlopeSample example_data_time_ticks[] =
+//{
+//  {0.0, "0"},	  {15.0, "15"},   {30.0, "30"},   {45.0, "45"},
+//  {60.0, "60"},   {90.0, "90"},   {120.0, "120"}, {150.0, "150"},
+//  {180.0, "180"}, {240.0, "240"}, {300.0, "300"}, {360.0, "360"}
+//};
 static SlopeScale *scale;
 static SlopeFigure *figure;
 static SlopeItem *series_md;
@@ -209,7 +209,7 @@ gui_driver(int argc, char *argv[])
   gtk_init (&argc, &argv);
   builder = gtk_builder_new ();
   gtk_builder_add_from_file (builder, GLADE_FILE_NAME, NULL);
-  box = GTK_WIDGET (gtk_builder_get_object (builder, KEY_BOX)); 
+  box = GTK_WIDGET (gtk_builder_get_object (builder, KEY_BOX));
   view = slope_view_new ();
   figure = slope_figure_new ();
   slope_view_set_figure (SLOPE_VIEW (view), figure);
@@ -219,7 +219,7 @@ gui_driver(int argc, char *argv[])
   gtk_builder_connect_signals (builder, NULL);
   g_object_unref (builder);
   g_signal_connect (window, "delete_event", G_CALLBACK (gtk_main_quit), NULL);
-  gtk_widget_show_all (GTK_WIDGET(window));  
+  gtk_widget_show_all (GTK_WIDGET(window));
   gtk_main ();
   return;
 }
@@ -297,7 +297,7 @@ G_MODULE_EXPORT on_btn_clear_clicked ()
 {
    for (int i = 0; i < NUMOF_EXAMPLE_DATA_POINTS; ++i) {
       gtk_entry_set_text (GTK_ENTRY (example_t[i]), "");
-      gtk_entry_set_text (GTK_ENTRY (example_p[i]), "");  
+      gtk_entry_set_text (GTK_ENTRY (example_p[i]), "");
    }
    gtk_entry_set_text (GTK_ENTRY (example_t[0]), "0");
    gtk_entry_set_text (GTK_ENTRY (example_p[0]), "0");
@@ -322,6 +322,9 @@ G_MODULE_EXPORT on_btn_clear_clicked ()
 void
 G_MODULE_EXPORT on_tick_zo_toggled (GtkWidget *widget, gpointer data)
 {
+   if (data) {
+      ;
+   }
   if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
     slope_scale_remove_item (scale, series_zo);
   else
@@ -333,6 +336,9 @@ G_MODULE_EXPORT on_tick_zo_toggled (GtkWidget *widget, gpointer data)
 void
 G_MODULE_EXPORT on_tick_fo_toggled (GtkWidget *widget, gpointer data)
 {
+   if (data) {
+      ;
+   }
   if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
     slope_scale_remove_item (scale, series_fo);
   else
@@ -344,6 +350,9 @@ G_MODULE_EXPORT on_tick_fo_toggled (GtkWidget *widget, gpointer data)
 void
 G_MODULE_EXPORT on_tick_he_toggled (GtkWidget *widget, gpointer data)
 {
+   if (data) {
+      ;
+   }
   if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
     slope_scale_remove_item (scale, series_he);
   else
@@ -355,6 +364,9 @@ G_MODULE_EXPORT on_tick_he_toggled (GtkWidget *widget, gpointer data)
 void
 G_MODULE_EXPORT on_tick_pe_toggled (GtkWidget *widget, gpointer data)
 {
+   if (data) {
+      ;
+   }
   if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
     slope_scale_remove_item (scale, series_pe);
   else
@@ -426,7 +438,7 @@ generate_plots ()
    double *x_zo, *y_zo;
    x_zo = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
    y_zo = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
-   for (int i = 0; i < NUMOF_PLOT_POINTS; ++i) 
+   for (int i = 0; i < NUMOF_PLOT_POINTS; ++i)
    {
       x_zo[i] = (double) i * max_minutes / (NUMOF_PLOT_POINTS - 1);
       y_zo[i] = models_params_struct.k0 * x_zo[i];
@@ -436,7 +448,7 @@ generate_plots ()
    double *x_fo, *y_fo;
    x_fo = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
    y_fo = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
-   for (int i = 0; i < NUMOF_PLOT_POINTS; ++i) 
+   for (int i = 0; i < NUMOF_PLOT_POINTS; ++i)
    {
       x_fo[i] = (double) i * max_minutes / (NUMOF_PLOT_POINTS - 1);
       y_fo[i] = (1 - exp (-1 * models_params_struct.k1 * x_fo[i])) * 100;
@@ -446,7 +458,7 @@ generate_plots ()
    double *x_he, *y_he;
    x_he = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
    y_he = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
-   for (int i = 0; i < NUMOF_PLOT_POINTS; ++i) 
+   for (int i = 0; i < NUMOF_PLOT_POINTS; ++i)
    {
       x_he[i] = (double) i * max_minutes / (NUMOF_PLOT_POINTS - 1);
       y_he[i] = models_params_struct.kh * sqrt (x_he[i]);
@@ -456,7 +468,7 @@ generate_plots ()
    double *x_pe, *y_pe;
    x_pe = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
    y_pe = g_malloc (NUMOF_PLOT_POINTS * sizeof (double));
-   for (int i = 0; i < NUMOF_PLOT_POINTS; ++i) 
+   for (int i = 0; i < NUMOF_PLOT_POINTS; ++i)
    {
       x_pe[i] = (double) i * max_minutes / (NUMOF_PLOT_POINTS - 1);
       y_pe[i] = models_params_struct.k * pow (x_pe[i], models_params_struct.tn);
@@ -479,7 +491,7 @@ fill_out_labels ()
    snprintf(number, BASE_10, "%.4f", models_params_struct.k0);
    gtk_label_set_text (GTK_LABEL(models_params[0]), number);
    snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_k0);
-   gtk_label_set_text (GTK_LABEL(models_params[1]),number);  
+   gtk_label_set_text (GTK_LABEL(models_params[1]),number);
    snprintf(number, BASE_10, "%.4f", models_params_struct.k1);
    gtk_label_set_text (GTK_LABEL(models_params[2]),number);
    snprintf(number, BASE_10, "%.4f", models_params_struct.rsq_k1);
@@ -569,13 +581,13 @@ digits_or_single_pt_only(char *entry)
    int all_good_flag = 1;
    int numof_pts = 0;
    size_t str_len = strlen (entry);
-   for (int i = 0; i < str_len; ++i) {
+   for (unsigned int i = 0; i < str_len; ++i) {
       if (entry[i] == '.') ++numof_pts;
    }
    if (numof_pts > 1) {
       return 0;
    }
-   for (int i = 0; i < str_len; ++i) {
+   for (unsigned int i = 0; i < str_len; ++i) {
       if (!(isdigit(entry[i]) || entry[i] == '.')) {
          return 0;
       }
@@ -588,11 +600,10 @@ digits_only(char *entry)
 {
    int all_good_flag = 1;
    size_t str_len = strlen (entry);
-   for (int i = 0; i < str_len; ++i) {
+   for (unsigned int i = 0; i < str_len; ++i) {
       if (!(isdigit(entry[i]))) {
          return 0;
       }
    }
    return all_good_flag;
 }
-

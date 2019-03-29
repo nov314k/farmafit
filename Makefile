@@ -1,8 +1,7 @@
 #!/usr/bin/make -f
 SHELL = /bin/sh
 CC = gcc
-#CFLAGS = -pedantic -Wall -Wextra -std=c99 -g
-CFLAGS = -std=c99
+CFLAGS = -Wall -Wextra -std=c99 -g #-pedantic
 APP = farmafit
 EXAMPLE = example.json
 OBJECTS = farmafit.o main.o
