@@ -20,10 +20,12 @@ indent_mode=2
 [project]
 name=farmafit
 base_path=C:\\msys64\\home\\novak\\dev\\farmafit\\
+description=
 
 [long line marker]
 long_line_behaviour=1
 long_line_column=80
 
 [files]
-current_page=-1
+current_page=0
+FILE_NAME_0=0;C;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Csrc%5Cmain.c;0;4
