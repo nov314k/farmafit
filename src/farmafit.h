@@ -39,7 +39,7 @@ struct lr;
  * @param[in] size Number of data points
  * @return Arithmetic mean of data
  */
-float fmf_armean (float *data, int size);
+float fmf_armean(float *data, int size);
 
 /**
  * @brief Calculates mean of products.
@@ -50,7 +50,7 @@ float fmf_armean (float *data, int size);
  * @return Mean of products
  * @note Number of data points in data1 and data2 must be the same.
  */
-float fmf_moprods (float *data1, float *data2, int size);
+float fmf_moprods(float *data1, float *data2, int size);
 
 /**
  * @brief Calculates variance.
@@ -59,7 +59,7 @@ float fmf_moprods (float *data1, float *data2, int size);
  * @param[in] size Number of data points
  * @return Variance
  */
-float fmf_variance (float *data, int size);
+float fmf_variance(float *data, int size);
 
 /**
  * @brief Uses linear regression to calculate slope and intercept.
@@ -70,8 +70,8 @@ float fmf_variance (float *data, int size);
  * @param[out] linreg Pointer to lr (linear regression) struct to hold the result
  * @return void
  */
-void fmf_calc_linreg (float *independent, float *dependent, int size,
-		 struct lr *linreg);
+void fmf_calc_linreg(float *independent, float *dependent, int size,
+					 struct lr *linreg);
 
 /**
  * @brief Calculates r squared (r^2) value.
@@ -81,7 +81,7 @@ void fmf_calc_linreg (float *independent, float *dependent, int size,
  * @param[in] size Number of data points
  * @return Value of r squared
  */
-float fmf_calc_rsq (float *x, float *y, int size);
+float fmf_calc_rsq(float *x, float *y, int size);
 
 /**
  * @brief Gets data points.
@@ -91,24 +91,24 @@ float fmf_calc_rsq (float *x, float *y, int size);
  *                     which contains measurement points (from JSON file)
  * @return Error code (to be documented)
  */
-int fmf_gtdpts (const char *const data_str, struct dp *head);
+int fmf_gtdpts(const char *const data_str, struct dp *head);
 
 /**
  * @brief Calculates all model parameters, including r-squared values
  * @param[in] file_name Name of the experimental measurements file
  * @return Structure containing parameters for all models 
  */
-struct models_params fmf_calc_params (struct dp *data_set);
+struct models_params fmf_calc_params(struct dp *data_set);
 
 /*
  * @brief Prints all model parameters, includin r-squared values
  * @param[in] file_name Name of the experimental measurements file
  * @return void 
  */
-void fmf_print_params (char *file_name);
+void fmf_print_params(char *file_name);
 
-void fmf_init_data_set (struct dp *);
+void fmf_init_data_set(struct dp *);
 
-void fmf_form_data_set (char *, struct dp *);
+void fmf_form_data_set(char *, struct dp *);
 
-#endif /* #ifndef FARMAFIT_H  */
+#endif							/* #ifndef FARMAFIT_H  */

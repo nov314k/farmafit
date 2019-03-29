@@ -35,11 +35,10 @@
  * @param mins Elapsed minutes (independent variable).
  * @param perc Percentage of the substance dissolved (dependent variable).
  */
-struct dp 
-{
-  float mins;
-  float perc;
-  struct dp *next;
+struct dp {
+	float mins;
+	float perc;
+	struct dp *next;
 };
 
 /**
@@ -48,10 +47,9 @@ struct dp
  * @param a Slope of the line.
  * @param b Intercept point.
  */
-struct lr 
-{
-  float a;
-  float b;
+struct lr {
+	float a;
+	float b;
 };
 
 /**
@@ -67,17 +65,16 @@ struct lr
  * @param rsq_kh r-squared value for Higuchi's model
  * @param rsq_k  r-squared value for Peppas' model
  */
-struct models_params
-{
-  float k0;
-  float k1;
-  float kh;
-  float k;
-  float tn;
-  float rsq_k0;
-  float rsq_k1;
-  float rsq_kh;
-  float rsq_k;
+struct models_params {
+	float k0;
+	float k1;
+	float kh;
+	float k;
+	float tn;
+	float rsq_k0;
+	float rsq_k1;
+	float rsq_kh;
+	float rsq_k;
 };
 
-#endif /* #ifndef DATA_TYPES_H  */
+#endif							/* #ifndef DATA_TYPES_H  */

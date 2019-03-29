@@ -35,4 +35,4 @@
 #define VALUE_NOT_SET -1.0
 #define BASIC_ERROR_MESSAGE "Error: Incorrect program usage."
 
-#endif /* #ifndef SYSTEM_H  */
+#endif							/* #ifndef SYSTEM_H  */
