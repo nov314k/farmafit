@@ -99,11 +99,10 @@ struct app {
 	GtkWidget **models_params;
 	GtkWindow *window;
 	GtkWidget *ticks[NUMOF_MODELS];
+	struct dp *data_set;
 	struct models_params models_params_vals;
 	gboolean done_calculating_and_plotting;
 };
-
-static struct dp *data_set;
 
 void help_version();
 void G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app);
@@ -147,11 +146,11 @@ G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
 		/* Four -1's are key to clearing the graph properly!  */
 		slope_scale_set_layout_rect(app->scale, -1, -1, -1, -1);
 		slope_view_redraw(SLOPE_VIEW(app->view));
-		g_free(data_set);
+		g_free(app->data_set);
 	}
-	data_set = (struct dp *)g_malloc(sizeof(struct dp));
-	fmf_init_data_set(data_set);
-	struct dp *current_point = data_set;
+	app->data_set = (struct dp *)g_malloc(sizeof(struct dp));
+	fmf_init_data_set(app->data_set);
+	struct dp *current_point = app->data_set;
 	unsigned int numof_valid_pts = 0;
 	char *aux_t = (char *)g_malloc(STR_LEN_FOR_CONVERSION * sizeof(char));
 	char *aux_p = (char *)g_malloc(STR_LEN_FOR_CONVERSION * sizeof(char));
@@ -200,7 +199,7 @@ G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
 	}
 	//fmf_form_data_set ("example.json", data_set);
 	if (numof_valid_pts >= 3) {
-		app->models_params_vals = fmf_calc_params(data_set);
+		app->models_params_vals = fmf_calc_params(app->data_set);
 		/*Change this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 		fill_out_labels(app->models_params_vals, app);
 		generate_plots(app);
@@ -368,7 +367,7 @@ G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app)
 		slope_scale_set_layout_rect(app->scale, -1, -1, -1, -1);
 		slope_view_redraw(SLOPE_VIEW(app->view));
 		/* TODO Check the need for this  */
-		free(data_set);
+		free(app->data_set);
 	}
 	/*******/
 	app->done_calculating_and_plotting = FALSE;
@@ -481,9 +480,9 @@ void generate_plots(struct app *app)
 {
 	struct dp *current_data_pt;
 	int numof_data_pts = 0;
-	if (data_set != NULL) {
+	if (app->data_set != NULL) {
 		++numof_data_pts;
-		current_data_pt = data_set;
+		current_data_pt = app->data_set;
 		while (current_data_pt->next != NULL) {
 			++numof_data_pts;
 			current_data_pt = current_data_pt->next;
@@ -496,7 +495,7 @@ void generate_plots(struct app *app)
 	SlopeSample *data_time_ticks;
 	data_time_ticks =
 		(SlopeSample *) g_malloc(numof_data_pts * sizeof(SlopeSample));
-	current_data_pt = data_set;
+	current_data_pt = app->data_set;
 	int max_minutes = 0;
 	char *aux;
 	for (int i = 0; i < numof_data_pts; ++i) {
