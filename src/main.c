@@ -110,6 +110,9 @@ void G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget *widget, struct mega *mega);
 void G_MODULE_EXPORT on_tick_he_toggled(GtkWidget *widget, struct mega *mega);
 void G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget *widget, struct mega *mega);
 
+void destroy (GtkWidget *window);
+gboolean delete_event(GtkWidget *window, GdkEvent *event);
+
 void generate_plots(struct mega *mega);
 void fill_out_labels(struct models_params models_params_struct, struct mega *mega);
 
@@ -246,13 +249,20 @@ void load_and_start_gui(int argc, char *argv[])
 	btn_calc_and_plot = GTK_WIDGET(gtk_builder_get_object(builder, "btn_calculate_and_plot"));
 	GtkWidget *btn_clear;
 	btn_clear = GTK_WIDGET(gtk_builder_get_object(builder, "btn_clear"));
+	GtkWidget *btn_close;
+	btn_close = GTK_WIDGET(gtk_builder_get_object(builder, "btn_close"));
 	/*******/
 	/* TODO Consider removing the line below  */
 	gtk_builder_connect_signals(builder, NULL);
 	g_signal_connect(btn_load_eg, "clicked", G_CALLBACK(on_btn_load_eg_clicked), &mega);
 	g_signal_connect(btn_calc_and_plot, "clicked", G_CALLBACK(on_btn_calc_and_plot_clicked), &mega);
 	g_signal_connect(btn_clear, "clicked", G_CALLBACK(on_btn_clear_clicked), &mega);
-	g_signal_connect(mega.window, "delete_event", G_CALLBACK(gtk_main_quit), NULL);
+	/* TODO Check the best way to exit the application  */
+	g_signal_connect(btn_close, "clicked", G_CALLBACK(gtk_main_quit), NULL);
+	g_signal_connect (mega.window, "destroy", G_CALLBACK(destroy), NULL);
+	g_signal_connect (mega.window, "delete_event", G_CALLBACK (delete_event), NULL);
+
+
 	g_signal_connect(mega.ticks[0], "toggled", G_CALLBACK(on_tick_zo_toggled), &mega);
 	g_signal_connect(mega.ticks[1], "toggled", G_CALLBACK(on_tick_fo_toggled), &mega);
 	g_signal_connect(mega.ticks[2], "toggled", G_CALLBACK(on_tick_he_toggled), &mega);
@@ -359,6 +369,7 @@ G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct mega *mega)
 	done_calculating_and_plotting = false;
 	return;
 }
+
 
 void
 G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget *widget, struct mega *mega)
@@ -631,4 +642,15 @@ int digits_only(char *entry)
 		}
 	}
 	return all_good_flag;
+}
+
+
+void destroy (GtkWidget *window)
+{
+	gtk_main_quit ();
+}
+
+gboolean delete_event(GtkWidget *window, GdkEvent *event)
+{
+	return FALSE;
 }
