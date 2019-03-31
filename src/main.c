@@ -42,29 +42,25 @@
 /*
  * TODO Change variable names to suit standard names
  * TODO Check if all proper Gtk types are used, to reduce type casting
- * TODO Ensure all floating point values for percentages are to three decimal
- * places as it seems to add other values that it shouldn't
- * TODO Change _Boolean to gboolean
  * TODO Check all places where creation of new objects is done
- * TODO
  **/
 
+#define NUMOF_MODELS 4
+#define NUMOF_PLOT_PTS 101
 #define NUMOF_MODELS_PARAMS 9
 #define MAX_NUMOF_DATA_PTS 12
-#define NUMOF_PLOT_PTS 101
-#define NUMOF_MODELS 4
+#define STR_LEN_FOR_CONVERSION 7
 #define MSG_NOT_CALCED "Not calculated"
 #define ERR_INCORR_ENTRY "ERROR: Incorrect entry."
 #define ERR_INSUFF_DATA_PTS "ERROR: Enter at least 3 valid data points."
 #define ERR_CALC_FIRST "ERROR: Please calculate models parameters first."
-#define STR_LEN_FOR_CONVERSION 7
 #define LBL_MEASURED_DATA "Measured data"
+#define LBL_PEPPAS_EQUATION "Peppas' equation"
+#define LBL_HIGUCHIS_EQUATION "Higuchi's equation"
 #define LBL_ZERO_ORDER_KINETICS "Zero-order kinetics"
 #define LBL_FIRST_ORDER_KINETICS "First-order kinetics"
-#define LBL_HIGUCHIS_EQUATION "Higuchi's equation"
-#define LBL_PEPPAS_EQUATION "Peppas' equation"
-#define GLADE_FILE_NAME "farmafit.glade"
 #define KEY_BOX "key_box"
+#define GLADE_FILE_NAME "farmafit.glade"
 static const char *time_entries_names[] = {
 	"t00", "t01", "t02", "t03", "t04", "t05", "t06", "t07", "t08", "t09", "t10", "t11"
 };
@@ -117,7 +113,7 @@ void destroy (GtkWidget *window);
 gboolean delete_event(GtkWidget *window, GdkEvent *event);
 
 void generate_plots(struct app *app);
-void fill_out_labels(struct models_params models_params_vals, struct app *app);
+void fill_out_labels(struct app *app);
 
 void G_MODULE_EXPORT show_msg_box(char *, GtkWindow *window);
 gboolean digits_or_single_pt_only(char *);
@@ -182,15 +178,15 @@ void read_data_set(struct app *app)
 	return;
 }
 
-void
-G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
+void G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
 {
+	if (widget == NULL) { /* suppress compiler warning */ }
 	clear_all_except_data_points(app);
 	read_data_set(app);
-	//~ //fmf_form_data_set ("example.json", data_set);
+	//fmf_form_data_set ("example.json", data_set);
 	if (app->numof_valid_pts >= 3) {
 		app->models_params_vals = fmf_calc_params(app->data_set);
-		fill_out_labels(app->models_params_vals, app);
+		fill_out_labels(app);
 		generate_plots(app);
 		app->done_calculating_and_plotting = TRUE;
 	}
@@ -225,7 +221,7 @@ void load_and_start_gui(int argc, char *argv[])
 	for (int i = 0; i < NUMOF_MODELS; ++i) {
 		app.ticks[i] = GTK_WIDGET(gtk_builder_get_object(builder, ticks_names[i]));
 	}
-	/*** Load buttons ***/
+    /*** Load buttons ***/
 	GtkWidget *btn_load_eg;
 	btn_load_eg = GTK_WIDGET(gtk_builder_get_object(builder, "btn_load_example"));
 	GtkWidget *btn_calc_and_plot;
@@ -361,6 +357,7 @@ void clear_data_points(struct app *app) {
 void
 G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app)
 {
+	if (widget == NULL) { /* suppress compiler warning */ }
 	clear_all_except_data_points(app);
 	clear_data_points(app);
 	return;
@@ -445,6 +442,7 @@ G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget *widget, struct app *app)
 void
 G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget *widget, struct app *app)
 {
+	if (widget == NULL) { /* suppress compiler warning */ }
 	clear_all_except_data_points(app);
 	clear_data_points(app);
 	char number_as_string[STR_LEN_FOR_CONVERSION];
@@ -472,7 +470,7 @@ void generate_plots(struct app *app)
 	data_time_values = (double *)g_malloc(app->numof_valid_pts * sizeof(double));
 	data_percentage_values = (double *)g_malloc(app->numof_valid_pts * sizeof(double));
 	SlopeSample data_time_ticks[app->numof_valid_pts];
-	for (int i = 0; i < app->numof_valid_pts; ++i) {
+	for (unsigned int i = 0; i < app->numof_valid_pts; ++i) {
 		data_time_values[i] = curr_point->mins;
 		data_percentage_values[i] = curr_point->perc;
 		if (data_time_values[i] > max_minutes) {
@@ -494,7 +492,7 @@ void generate_plots(struct app *app)
 	app->scale = slope_xyscale_new();
 	slope_figure_add_scale(SLOPE_FIGURE(app->figure), app->scale);
 	slope_scale_set_layout_rect(app->scale, 0, 0, 1, 1);
-	/* TODO Consider adding free everywhere  */
+	/* TODO Consider free-ing everywhere  */
 	if (app->done_calculating_and_plotting) {
 		free(app->series_md);
 	}
@@ -558,27 +556,26 @@ void generate_plots(struct app *app)
 	return;
 }
 
-/* Two parameters are redundant, but changing to one struct app app causes probelsm */
-void fill_out_labels(struct models_params models_params_vals, struct app *app)
+void fill_out_labels(struct app *app)
 {
 	char number[STR_LEN_FOR_CONVERSION];
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.k0);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.k0);
 	gtk_label_set_text(GTK_LABEL(app->models_params[0]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.rsq_k0);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.rsq_k0);
 	gtk_label_set_text(GTK_LABEL(app->models_params[1]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.k1);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.k1);
 	gtk_label_set_text(GTK_LABEL(app->models_params[2]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.rsq_k1);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.rsq_k1);
 	gtk_label_set_text(GTK_LABEL(app->models_params[3]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.kh);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.kh);
 	gtk_label_set_text(GTK_LABEL(app->models_params[4]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.rsq_kh);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.rsq_kh);
 	gtk_label_set_text(GTK_LABEL(app->models_params[5]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.k);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.k);
 	gtk_label_set_text(GTK_LABEL(app->models_params[6]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.tn);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.tn);
 	gtk_label_set_text(GTK_LABEL(app->models_params[7]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.rsq_k);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.rsq_k);
 	gtk_label_set_text(GTK_LABEL(app->models_params[8]), number);
 	return;
 }
@@ -627,12 +624,14 @@ gboolean digits_only(char *entry)
 	return all_good_flag;
 }
 
-void destroy (GtkWidget *window)
+void destroy(GtkWidget *window)
 {
-	gtk_main_quit ();
+	if (window == NULL) { /* suppress compiler warning */ }
+	gtk_main_quit();
 }
 
 gboolean delete_event(GtkWidget *window, GdkEvent *event)
 {
+	if (window == NULL || event == NULL) { /* suppress compiler warning */ }
 	return FALSE;
 }
