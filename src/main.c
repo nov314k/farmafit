@@ -99,9 +99,9 @@ struct app {
 	GtkWidget **models_params;
 	GtkWindow *window;
 	GtkWidget *ticks[NUMOF_MODELS];
+	struct models_params models_params_vals;
 };
 
-static struct models_params models_params_struct;
 static struct dp *data_set;
 static _Bool done_calculating_and_plotting = false;
 
@@ -117,7 +117,7 @@ void destroy (GtkWidget *window);
 gboolean delete_event(GtkWidget *window, GdkEvent *event);
 
 void generate_plots(struct app *app);
-void fill_out_labels(struct models_params models_params_struct, struct app *app);
+void fill_out_labels(struct models_params models_params_vals, struct app *app);
 
 void G_MODULE_EXPORT show_msg_box(char *, GtkWindow *window);
 int digits_or_single_pt_only(char *);
@@ -200,8 +200,9 @@ G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
 	}
 	//fmf_form_data_set ("example.json", data_set);
 	if (numof_valid_pts >= 3) {
-		models_params_struct = fmf_calc_params(data_set);
-		fill_out_labels(models_params_struct, app);
+		app->models_params_vals = fmf_calc_params(data_set);
+		/*Change this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+		fill_out_labels(app->models_params_vals, app);
 		generate_plots(app);
 		done_calculating_and_plotting = true;
 	} else {
@@ -526,7 +527,7 @@ void generate_plots(struct app *app)
 	y_zo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
 		x_zo[i] = (double)i *max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_zo[i] = models_params_struct.k0 * x_zo[i];
+		y_zo[i] = app->models_params_vals.k0 * x_zo[i];
 	}
 	app->series_zo =
 		slope_xyseries_new_filled(LBL_ZERO_ORDER_KINETICS, x_zo, y_zo,
@@ -537,7 +538,7 @@ void generate_plots(struct app *app)
 	y_fo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
 		x_fo[i] = (double)i *max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_fo[i] = (1 - exp(-1 * models_params_struct.k1 * x_fo[i])) * 100;
+		y_fo[i] = (1 - exp(-1 * app->models_params_vals.k1 * x_fo[i])) * 100;
 	}
 	app->series_fo =
 		slope_xyseries_new_filled(LBL_FIRST_ORDER_KINETICS, x_fo, y_fo,
@@ -548,7 +549,7 @@ void generate_plots(struct app *app)
 	y_he = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
 		x_he[i] = (double)i *max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_he[i] = models_params_struct.kh * sqrt(x_he[i]);
+		y_he[i] = app->models_params_vals.kh * sqrt(x_he[i]);
 	}
 	app->series_he =
 		slope_xyseries_new_filled(LBL_HIGUCHIS_EQUATION, x_he, y_he,
@@ -560,7 +561,7 @@ void generate_plots(struct app *app)
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
 		x_pe[i] = (double)i *max_minutes / (NUMOF_PLOT_PTS - 1);
 		y_pe[i] =
-			models_params_struct.k * pow(x_pe[i], models_params_struct.tn);
+			app->models_params_vals.k * pow(x_pe[i], app->models_params_vals.tn);
 	}
 	app->series_pe =
 		slope_xyseries_new_filled(LBL_PEPPAS_EQUATION, x_pe, y_pe,
@@ -576,26 +577,26 @@ void generate_plots(struct app *app)
 	return;
 }
 
-void fill_out_labels(struct models_params models_params_struct, struct app *app)
+void fill_out_labels(struct models_params models_params_vals, struct app *app)
 {
 	char number[STR_LEN_FOR_CONVERSION];
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_struct.k0);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.k0);
 	gtk_label_set_text(GTK_LABEL(app->models_params[0]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_struct.rsq_k0);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.rsq_k0);
 	gtk_label_set_text(GTK_LABEL(app->models_params[1]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_struct.k1);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.k1);
 	gtk_label_set_text(GTK_LABEL(app->models_params[2]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_struct.rsq_k1);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.rsq_k1);
 	gtk_label_set_text(GTK_LABEL(app->models_params[3]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_struct.kh);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.kh);
 	gtk_label_set_text(GTK_LABEL(app->models_params[4]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_struct.rsq_kh);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.rsq_kh);
 	gtk_label_set_text(GTK_LABEL(app->models_params[5]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_struct.k);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.k);
 	gtk_label_set_text(GTK_LABEL(app->models_params[6]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_struct.tn);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.tn);
 	gtk_label_set_text(GTK_LABEL(app->models_params[7]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_struct.rsq_k);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", models_params_vals.rsq_k);
 	gtk_label_set_text(GTK_LABEL(app->models_params[8]), number);
 	return;
 }
