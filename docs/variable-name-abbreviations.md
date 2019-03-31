@@ -3,9 +3,11 @@ Name arrays in plural.
 beg 	= beginning
 btn		= button
 calc	= calculate
+calcing	= calculating
 calcn	= calculation
 calced	= calculated
 corr 	= correct
+curr	= current
 eg 		= example
 eq 		= equation
 incorr 	= incorrect

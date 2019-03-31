@@ -57,7 +57,7 @@
 #define ERR_INCORR_ENTRY "ERROR: Incorrect entry."
 #define ERR_INSUFF_DATA_PTS "ERROR: Enter at least 3 valid data points."
 #define ERR_CALC_FIRST "ERROR: Please calculate models parameters first."
-#define STR_LEN_FOR_CONVERSION 6
+#define STR_LEN_FOR_CONVERSION 7
 #define LBL_MEASURED_DATA "Measured data"
 #define LBL_ZERO_ORDER_KINETICS "Zero-order kinetics"
 #define LBL_FIRST_ORDER_KINETICS "First-order kinetics"
@@ -94,13 +94,14 @@ struct app {
 	SlopeItem *series_fo;
 	SlopeItem *series_he;
 	GtkWidget *view;
-	GtkWidget **time_entries;
-	GtkWidget **perc_entries;
-	GtkWidget **models_params;
-	GtkWindow *window;
 	GtkWidget *ticks[NUMOF_MODELS];
+	GtkWidget *time_entries[MAX_NUMOF_DATA_PTS];
+	GtkWidget *perc_entries[MAX_NUMOF_DATA_PTS];
+	GtkWidget *models_params[NUMOF_MODELS_PARAMS];
+	GtkWindow *window;
 	struct dp *data_set;
 	struct models_params models_params_vals;
+	unsigned int numof_valid_pts;
 	gboolean done_calculating_and_plotting;
 };
 
@@ -119,49 +120,26 @@ void generate_plots(struct app *app);
 void fill_out_labels(struct models_params models_params_vals, struct app *app);
 
 void G_MODULE_EXPORT show_msg_box(char *, GtkWindow *window);
-int digits_or_single_pt_only(char *);
-int digits_only(char *entry);
+gboolean digits_or_single_pt_only(char *);
+gboolean digits_only(char *entry);
+void clear_all_except_data_points(struct app *app);
+void clear_data_points(struct app *app);
 
-void
-G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
+void read_data_set(struct app *app)
 {
-	if (app->done_calculating_and_plotting) {
-		slope_scale_remove_item(app->scale, app->series_md);
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[0]))) {
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[0]), FALSE);
-			slope_scale_remove_item(app->scale, app->series_zo);
-		}
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[1]))) {
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[1]), FALSE);
-			slope_scale_remove_item(app->scale, app->series_fo);
-		}
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[2]))) {
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[2]), FALSE);
-			slope_scale_remove_item(app->scale, app->series_he);
-		}
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[3]))) {
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[3]), FALSE);
-			slope_scale_remove_item(app->scale, app->series_pe);
-		}
-		/* Four -1's are key to clearing the graph properly!  */
-		slope_scale_set_layout_rect(app->scale, -1, -1, -1, -1);
-		slope_view_redraw(SLOPE_VIEW(app->view));
-		g_free(app->data_set);
-	}
-	app->data_set = (struct dp *)g_malloc(sizeof(struct dp));
 	fmf_init_data_set(app->data_set);
 	struct dp *current_point = app->data_set;
-	unsigned int numof_valid_pts = 0;
-	char *aux_t = (char *)g_malloc(STR_LEN_FOR_CONVERSION * sizeof(char));
-	char *aux_p = (char *)g_malloc(STR_LEN_FOR_CONVERSION * sizeof(char));
+	app->numof_valid_pts = 0;
+	char aux_t[STR_LEN_FOR_CONVERSION];
+	char aux_p[STR_LEN_FOR_CONVERSION];
 	/* Cast from const char * to avoid compiler warnings  */
-	aux_t = (char *)gtk_entry_get_text(GTK_ENTRY(app->time_entries[0]));
+	strcpy(aux_t, (char *)gtk_entry_get_text(GTK_ENTRY(app->time_entries[0])));
 	if (!digits_only(aux_t)) {
 		show_msg_box(ERR_INCORR_ENTRY, app->window);
 		gtk_widget_grab_focus(app->time_entries[0]);
 		return;
 	}
-	aux_p = (char *)gtk_entry_get_text(GTK_ENTRY(app->perc_entries[0]));
+	strcpy(aux_p, (char *)gtk_entry_get_text(GTK_ENTRY(app->perc_entries[0])));
 	if (!digits_or_single_pt_only(aux_p)) {
 		show_msg_box(ERR_INCORR_ENTRY, app->window);
 		gtk_widget_grab_focus(app->perc_entries[0]);
@@ -169,16 +147,16 @@ G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
 	}
 	current_point->mins = atof(aux_t);
 	current_point->perc = atof(aux_p);
-	++numof_valid_pts;
+	++(app->numof_valid_pts);
 	gboolean found_the_end = FALSE;
 	for (unsigned int i = 1; i < MAX_NUMOF_DATA_PTS && !found_the_end; ++i) {
-		aux_t = (char *)gtk_entry_get_text(GTK_ENTRY(app->time_entries[i]));
+		strcpy(aux_t, (char *)gtk_entry_get_text(GTK_ENTRY(app->time_entries[i])));
 		if (!digits_only(aux_t)) {
 			show_msg_box(ERR_INCORR_ENTRY, app->window);
 			gtk_widget_grab_focus(app->time_entries[i]);
 			return;
 		}
-		aux_p = (char *)gtk_entry_get_text(GTK_ENTRY(app->perc_entries[i]));
+		strcpy(aux_p, (char *)gtk_entry_get_text(GTK_ENTRY(app->perc_entries[i])));
 		if (!digits_or_single_pt_only(aux_p)) {
 			show_msg_box(ERR_INCORR_ENTRY, app->window);
 			gtk_widget_grab_focus(app->perc_entries[i]);
@@ -188,64 +166,66 @@ G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
 			|| strlen(aux_p) == 0) {
 			found_the_end = TRUE;
 		} else {
-			struct dp *dp_ = (struct dp *)g_malloc(sizeof(struct dp));
-			dp_->mins = atof(aux_t);
-			dp_->perc = atof(aux_p);
-			current_point->next = dp_;
-			current_point = dp_;
+			struct dp *dp = (struct dp *)g_malloc(sizeof(struct dp));
+			dp->mins = atof(aux_t);
+			dp->perc = atof(aux_p);
+			current_point->next = dp;
+			current_point = dp;
 			current_point->next = NULL;
-			++numof_valid_pts;
+			++(app->numof_valid_pts);
 		}
 	}
-	//fmf_form_data_set ("example.json", data_set);
-	if (numof_valid_pts >= 3) {
+	if (app->numof_valid_pts < 3) {
+		show_msg_box(ERR_INSUFF_DATA_PTS, app->window);
+		gtk_widget_grab_focus(app->time_entries[app->numof_valid_pts]);
+	}
+	return;
+}
+
+void
+G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
+{
+	clear_all_except_data_points(app);
+	read_data_set(app);
+	//~ //fmf_form_data_set ("example.json", data_set);
+	if (app->numof_valid_pts >= 3) {
 		app->models_params_vals = fmf_calc_params(app->data_set);
-		/*Change this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 		fill_out_labels(app->models_params_vals, app);
 		generate_plots(app);
 		app->done_calculating_and_plotting = TRUE;
-	} else {
-		show_msg_box(ERR_INSUFF_DATA_PTS, app->window);
-		gtk_widget_grab_focus(app->time_entries[numof_valid_pts]);
 	}
 	return;
 }
 
 void load_and_start_gui(int argc, char *argv[])
 {
-	struct app app;
 	gtk_init(&argc, &argv);
-	/*******/
 	GtkBuilder *builder;
 	builder = gtk_builder_new();
 	gtk_builder_add_from_file(builder, GLADE_FILE_NAME, NULL);
+	struct app app;
 	app.window = GTK_WINDOW(gtk_builder_get_object(builder, "top_window"));
-	/*******/
+	/*** Place Slope view into KEY_BOX ***/
 	GtkWidget *box;
 	box = GTK_WIDGET(gtk_builder_get_object(builder, KEY_BOX));
-	/*******/
 	app.view = slope_view_new();
 	app.figure = slope_figure_new();
 	slope_view_set_figure(SLOPE_VIEW(app.view), app.figure);
 	gtk_box_pack_start(GTK_BOX(box), app.view, TRUE, TRUE, 0);
-	/*******/
-	app.time_entries = (GtkWidget **) g_malloc(MAX_NUMOF_DATA_PTS * sizeof(GtkWidget *));
-	app.perc_entries = (GtkWidget **) g_malloc(MAX_NUMOF_DATA_PTS * sizeof(GtkWidget *));
+	/*** Load IO widgets ***/
 	for (int i = 0; i < MAX_NUMOF_DATA_PTS; ++i) {
 		app.time_entries[i] = GTK_WIDGET(gtk_builder_get_object(builder, time_entries_names[i]));
 		app.perc_entries[i] = GTK_WIDGET(gtk_builder_get_object(builder, perc_entries_names[i]));
 	}
-	app.models_params = (GtkWidget **) g_malloc(NUMOF_MODELS_PARAMS * sizeof(GtkWidget *));
 	gtk_entry_set_text(GTK_ENTRY(app.time_entries[0]), "0");
 	gtk_entry_set_text(GTK_ENTRY(app.perc_entries[0]), "0");
 	for (int i = 0; i < NUMOF_MODELS_PARAMS; ++i) {
 		app.models_params[i] = GTK_WIDGET(gtk_builder_get_object(builder, models_params_names[i]));
 	}
 	for (int i = 0; i < NUMOF_MODELS; ++i) {
-		app.ticks[i] = gtk_check_button_new();
 		app.ticks[i] = GTK_WIDGET(gtk_builder_get_object(builder, ticks_names[i]));
 	}
-	/*******/
+	/*** Load buttons ***/
 	GtkWidget *btn_load_eg;
 	btn_load_eg = GTK_WIDGET(gtk_builder_get_object(builder, "btn_load_example"));
 	GtkWidget *btn_calc_and_plot;
@@ -254,9 +234,7 @@ void load_and_start_gui(int argc, char *argv[])
 	btn_clear = GTK_WIDGET(gtk_builder_get_object(builder, "btn_clear"));
 	GtkWidget *btn_close;
 	btn_close = GTK_WIDGET(gtk_builder_get_object(builder, "btn_close"));
-	/*******/
-	/* TODO Consider removing the line below  */
-	//gtk_builder_connect_signals(builder, NULL);
+	/*** Connect signals ***/
 	g_signal_connect(btn_load_eg, "clicked", G_CALLBACK(on_btn_load_eg_clicked), &app);
 	g_signal_connect(btn_calc_and_plot, "clicked", G_CALLBACK(on_btn_calc_and_plot_clicked), &app);
 	g_signal_connect(btn_clear, "clicked", G_CALLBACK(on_btn_clear_clicked), &app);
@@ -264,13 +242,12 @@ void load_and_start_gui(int argc, char *argv[])
 	g_signal_connect(btn_close, "clicked", G_CALLBACK(gtk_main_quit), NULL);
 	g_signal_connect (app.window, "destroy", G_CALLBACK(destroy), NULL);
 	g_signal_connect (app.window, "delete_event", G_CALLBACK (delete_event), NULL);
-
-
 	g_signal_connect(app.ticks[0], "toggled", G_CALLBACK(on_tick_zo_toggled), &app);
 	g_signal_connect(app.ticks[1], "toggled", G_CALLBACK(on_tick_fo_toggled), &app);
 	g_signal_connect(app.ticks[2], "toggled", G_CALLBACK(on_tick_he_toggled), &app);
 	g_signal_connect(app.ticks[3], "toggled", G_CALLBACK(on_tick_pe_toggled), &app);
-	/*******/
+	/*** Start application ***/
+	app.data_set = (struct dp *)g_malloc(sizeof(struct dp));
 	app.done_calculating_and_plotting = FALSE;
 	g_object_unref(builder);
 	gtk_widget_show_all(GTK_WIDGET(app.window));
@@ -340,40 +317,54 @@ void help_version()
 	return;
 }
 
-void
-G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app)
-{
-	for (int i = 0; i < NUMOF_MODELS; ++i) {
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[i]))) {
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[i]), FALSE);
-		}
-	}
-	/*******/
-	for (int i = 0; i < MAX_NUMOF_DATA_PTS; ++i) {
-		gtk_entry_set_text(GTK_ENTRY(app->time_entries[i]), "");
-		gtk_entry_set_text(GTK_ENTRY(app->perc_entries[i]), "");
-	}
-	/*******/
-	gtk_entry_set_text(GTK_ENTRY(app->time_entries[0]), "0");
-	gtk_entry_set_text(GTK_ENTRY(app->perc_entries[0]), "0");
-	/*******/
-	for (int i = 0; i < NUMOF_MODELS_PARAMS; ++i) {
-		gtk_label_set_text(GTK_LABEL(app->models_params[i]), MSG_NOT_CALCED);
-	}
-	/*******/
+void clear_all_except_data_points(struct app *app) {
 	if (app->done_calculating_and_plotting) {
+		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[0]))) {
+			/* TODO Check if this will also clear lines on graph if plotted? */
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[0]), FALSE);
+			slope_scale_remove_item(app->scale, app->series_zo);
+		}
+		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[1]))) {
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[1]), FALSE);
+			slope_scale_remove_item(app->scale, app->series_fo);
+		}
+		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[2]))) {
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[2]), FALSE);
+			slope_scale_remove_item(app->scale, app->series_he);
+		}
+		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[3]))) {
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[3]), FALSE);
+			slope_scale_remove_item(app->scale, app->series_pe);
+		}
 		slope_scale_remove_item(app->scale, app->series_md);
 		/* Four -1's are key to clearing the graph properly!  */
 		slope_scale_set_layout_rect(app->scale, -1, -1, -1, -1);
 		slope_view_redraw(SLOPE_VIEW(app->view));
-		/* TODO Check the need for this  */
-		free(app->data_set);
+		for (int i = 0; i < NUMOF_MODELS_PARAMS; ++i) {
+			gtk_label_set_text(GTK_LABEL(app->models_params[i]), MSG_NOT_CALCED);
+		}
 	}
-	/*******/
 	app->done_calculating_and_plotting = FALSE;
 	return;
 }
 
+void clear_data_points(struct app *app) {
+	for (int i = 0; i < MAX_NUMOF_DATA_PTS; ++i) {
+		gtk_entry_set_text(GTK_ENTRY(app->time_entries[i]), "");
+		gtk_entry_set_text(GTK_ENTRY(app->perc_entries[i]), "");
+	}
+	gtk_entry_set_text(GTK_ENTRY(app->time_entries[0]), "0");
+	gtk_entry_set_text(GTK_ENTRY(app->perc_entries[0]), "0");
+	return;
+}
+
+void
+G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app)
+{
+	clear_all_except_data_points(app);
+	clear_data_points(app);
+	return;
+}
 
 void
 G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget *widget, struct app *app)
@@ -454,107 +445,97 @@ G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget *widget, struct app *app)
 void
 G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget *widget, struct app *app)
 {
-	for (int i = 0; i < NUMOF_MODELS; ++i) {
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[i]))) {
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[i]), FALSE);
-		}
-	}
-	/*******/
+	clear_all_except_data_points(app);
+	clear_data_points(app);
 	char number_as_string[STR_LEN_FOR_CONVERSION];
 	for (int i = 0; i < MAX_NUMOF_DATA_PTS; ++i) {
-		sprintf(number_as_string, "%.0f", eg_data_time_vals[i]);
+		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.0f", eg_data_time_vals[i]);
 		gtk_entry_set_text(GTK_ENTRY(app->time_entries[i]), number_as_string);
-		sprintf(number_as_string, "%.3f", eg_data_perc_vals[i]);
+		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.3f", eg_data_perc_vals[i]);
 		gtk_entry_set_text(GTK_ENTRY(app->perc_entries[i]), number_as_string);
 	}
-	/*******/
-	for (int i = 0; i < NUMOF_MODELS_PARAMS; ++i) {
-		gtk_label_set_text(GTK_LABEL(app->models_params[i]), MSG_NOT_CALCED);
-	}
-	/*******/
-	app->done_calculating_and_plotting = FALSE;
 	return;
 }
 
 void generate_plots(struct app *app)
 {
-	struct dp *current_data_pt;
-	int numof_data_pts = 0;
-	if (app->data_set != NULL) {
-		++numof_data_pts;
-		current_data_pt = app->data_set;
-		while (current_data_pt->next != NULL) {
-			++numof_data_pts;
-			current_data_pt = current_data_pt->next;
-		}
-	}
-	double *data_time_values =
-		(double *)g_malloc(numof_data_pts * sizeof(double));
-	double *data_percentage_values =
-		(double *)g_malloc(numof_data_pts * sizeof(double));
-	SlopeSample *data_time_ticks;
-	data_time_ticks =
-		(SlopeSample *) g_malloc(numof_data_pts * sizeof(SlopeSample));
-	current_data_pt = app->data_set;
+	/* curr_point is for getting values out of data_set,
+	 * because it's only a pointer to a _single_ data point.  */
+	struct dp *curr_point = app->data_set;
 	int max_minutes = 0;
 	char *aux;
-	for (int i = 0; i < numof_data_pts; ++i) {
-		//printf("%f\t%f\n", current_data_pt->mins, current_data_pt->perc);
-		data_time_values[i] = current_data_pt->mins;
-		data_percentage_values[i] = current_data_pt->perc;
+	/* Two values below have to be declared and constructed like this.
+	 * since otherwise slope_xyseries_new_filled does not add them
+	 * properly to the graph.  */
+	double *data_time_values;
+	double *data_percentage_values;
+	data_time_values = (double *)g_malloc(app->numof_valid_pts * sizeof(double));
+	data_percentage_values = (double *)g_malloc(app->numof_valid_pts * sizeof(double));
+	SlopeSample data_time_ticks[app->numof_valid_pts];
+	for (int i = 0; i < app->numof_valid_pts; ++i) {
+		data_time_values[i] = curr_point->mins;
+		data_percentage_values[i] = curr_point->perc;
 		if (data_time_values[i] > max_minutes) {
 			max_minutes = data_time_values[i];
 		}
 		data_time_ticks[i].coord = data_time_values[i];
+		/* TODO This is  problematic!
+		 * strcpy(data_time_ticks[i].label, aux); does not work,
+		 * so every time I create a new aux (which is a char *),
+		 * and make label point to the same place, since otherwise I get
+		 * the same labels on the x axis. It needs to be fixed.
+		 * Perhas changing it to an array of aux's is a solution?  */
 		aux = (char *)g_malloc(STR_LEN_FOR_CONVERSION * sizeof(char));
-		sprintf(aux, "%d", (int)data_time_values[i]);
+		snprintf(aux, STR_LEN_FOR_CONVERSION, "%d", (int)data_time_values[i]);
+		//strcpy(data_time_ticks[i].label, aux);
 		data_time_ticks[i].label = aux;
-		current_data_pt = current_data_pt->next;
-		//printf("%f\t%f\n", data_time_values[i], data_percentage_values[i]);
+		curr_point = curr_point->next;
 	}
 	app->scale = slope_xyscale_new();
 	slope_figure_add_scale(SLOPE_FIGURE(app->figure), app->scale);
 	slope_scale_set_layout_rect(app->scale, 0, 0, 1, 1);
-	/* Beware: Changing from 12 to 14 below does funny things!  */
-	//series_md = slope_xyseries_new_filled (LBL_MEASURED_DATA, example_data_time_values, example_data_percentage_values, 12, "kor");
+	/* TODO Consider adding free everywhere  */
+	if (app->done_calculating_and_plotting) {
+		free(app->series_md);
+	}
 	app->series_md =
 		slope_xyseries_new_filled(LBL_MEASURED_DATA, data_time_values,
-								  data_percentage_values, 12, "kor");
+								  data_percentage_values, app->numof_valid_pts, "kor");
 	slope_scale_add_item(app->scale, app->series_md);
-	/* Zero-order kinetics  */
+	/*** Zero-order kinetics ***/
 	double *x_zo, *y_zo;
 	x_zo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	y_zo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
-		x_zo[i] = (double)i *max_minutes / (NUMOF_PLOT_PTS - 1);
+		x_zo[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
 		y_zo[i] = app->models_params_vals.k0 * x_zo[i];
 	}
 	app->series_zo =
 		slope_xyseries_new_filled(LBL_ZERO_ORDER_KINETICS, x_zo, y_zo,
 								  NUMOF_PLOT_PTS, "r-");
-	/* First-order kinetics  */
+	/*** First-order kinetics ***/
 	double *x_fo, *y_fo;
 	x_fo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	y_fo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
-		x_fo[i] = (double)i *max_minutes / (NUMOF_PLOT_PTS - 1);
+		x_fo[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
 		y_fo[i] = (1 - exp(-1 * app->models_params_vals.k1 * x_fo[i])) * 100;
 	}
 	app->series_fo =
 		slope_xyseries_new_filled(LBL_FIRST_ORDER_KINETICS, x_fo, y_fo,
 								  NUMOF_PLOT_PTS, "m-");
-	/* Higuchi's equation  */
+	/*** Higuchi's equation ***/
 	double *x_he, *y_he;
 	x_he = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	y_he = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
-		x_he[i] = (double)i *max_minutes / (NUMOF_PLOT_PTS - 1);
+		x_he[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
 		y_he[i] = app->models_params_vals.kh * sqrt(x_he[i]);
 	}
 	app->series_he =
 		slope_xyseries_new_filled(LBL_HIGUCHIS_EQUATION, x_he, y_he,
 								  NUMOF_PLOT_PTS, "g-");
-	/* Peppas' equation  */
+	/*** Peppas' equation ***/
 	double *x_pe, *y_pe;
 	x_pe = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	y_pe = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
@@ -566,17 +547,18 @@ void generate_plots(struct app *app)
 	app->series_pe =
 		slope_xyseries_new_filled(LBL_PEPPAS_EQUATION, x_pe, y_pe,
 								  NUMOF_PLOT_PTS, "b-");
-	/* Setting up the graph  */
+	/*** Setting up the graph ***/
 	SlopeItem *x_axis;
 	x_axis =
 		slope_xyscale_get_axis(SLOPE_XYSCALE(app->scale), SLOPE_XYSCALE_AXIS_BOTTOM);
 	SlopeSampler *x_sampler;
 	x_sampler = slope_xyaxis_get_sampler(SLOPE_XYAXIS(x_axis));
-	slope_sampler_set_samples(x_sampler, data_time_ticks, numof_data_pts);
+	slope_sampler_set_samples(x_sampler, data_time_ticks, app->numof_valid_pts);
 	slope_view_redraw(SLOPE_VIEW(app->view));
 	return;
 }
 
+/* Two parameters are redundant, but changing to one struct app app causes probelsm */
 void fill_out_labels(struct models_params models_params_vals, struct app *app)
 {
 	char number[STR_LEN_FOR_CONVERSION];
@@ -601,8 +583,7 @@ void fill_out_labels(struct models_params models_params_vals, struct app *app)
 	return;
 }
 
-void
-G_MODULE_EXPORT show_msg_box(char *msg_text, GtkWindow *window)
+void G_MODULE_EXPORT show_msg_box(char *msg_text, GtkWindow *window)
 {
 	GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
 	GtkWidget *dialog;
@@ -614,10 +595,9 @@ G_MODULE_EXPORT show_msg_box(char *msg_text, GtkWindow *window)
 	gtk_widget_destroy(dialog);
 }
 
-/* TODO Change to gbool?  */
-int digits_or_single_pt_only(char *entry)
+gboolean digits_or_single_pt_only(char *entry)
 {
-	int all_good_flag = 1;
+	gboolean all_good_flag = TRUE;
 	int numof_pts = 0;
 	size_t str_len = strlen(entry);
 	for (unsigned int i = 0; i < str_len; ++i) {
@@ -625,29 +605,27 @@ int digits_or_single_pt_only(char *entry)
 			++numof_pts;
 	}
 	if (numof_pts > 1) {
-		return 0;
+		return FALSE;
 	}
 	for (unsigned int i = 0; i < str_len; ++i) {
 		if (!(isdigit(entry[i]) || entry[i] == '.')) {
-			return 0;
+			return FALSE;
 		}
 	}
 	return all_good_flag;
 }
 
-/* TODO Change to gbool?  */
-int digits_only(char *entry)
+gboolean digits_only(char *entry)
 {
-	int all_good_flag = 1;
+	gboolean all_good_flag = TRUE;
 	size_t str_len = strlen(entry);
 	for (unsigned int i = 0; i < str_len; ++i) {
 		if (!(isdigit(entry[i]))) {
-			return 0;
+			return FALSE;
 		}
 	}
 	return all_good_flag;
 }
-
 
 void destroy (GtkWidget *window)
 {
