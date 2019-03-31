@@ -30,7 +30,7 @@ Author: Novak Petrovic
   <object class="GtkEntryCompletion" id="entrycompletion1"/>
   <object class="GtkWindow" id="top_window">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Farmafit</property>
+    <property name="title" translatable="yes">farmafit</property>
     <property name="resizable">False</property>
     <property name="window_position">center</property>
     <child>
@@ -48,12 +48,12 @@ Author: Novak Petrovic
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_text" translatable="yes">Time in minutes, measured from the start of the experiment, when the measurement was taken. At the start of the experiment t = 0. Use only positive values, and decimal point separator.</property>
+                <property name="tooltip_text" translatable="yes">Time in minutes, measured from the start of the experiment, when the measurement was taken. At the start of the experiment t = 0. Use only whole positive values (without decimal points).</property>
                 <property name="margin_top">4</property>
                 <property name="margin_bottom">4</property>
                 <property name="label" translatable="yes">Minutes</property>
                 <attributes>
-                  <attribute name="font-desc" value="Sans Bold 12"/>
+                  <attribute name="font-desc" value="Sans Oblique 12"/>
                 </attributes>
               </object>
               <packing>
@@ -65,12 +65,12 @@ Author: Novak Petrovic
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_text" translatable="yes">Measured value: percentage of the dissolved substance that you have measured. There is no need to enter the % sign in boxes below; enter 33.67 to record 33.67%. Use only positive values, and decimal point separator.</property>
+                <property name="tooltip_text" translatable="yes">Measured value: percentage of dissolved substance that you have measured. There is no need to enter the percent sign (%) in boxes below; enter 33.67 to record 33.67%. Use only positive values, and a single decimal point separator.</property>
                 <property name="margin_top">4</property>
                 <property name="margin_bottom">4</property>
                 <property name="label" translatable="yes">Percentage</property>
                 <attributes>
-                  <attribute name="font-desc" value="Sans Bold 12"/>
+                  <attribute name="font-desc" value="Sans Oblique 12"/>
                 </attributes>
               </object>
               <packing>
@@ -82,7 +82,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="t00">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="tooltip_text" translatable="yes">We suggest you use t = 0 for the starting value, but change it to suit your needs.</property>
+                <property name="tooltip_text" translatable="yes">We suggest you use t = 0 as the starting value, but change it to suit your needs.</property>
                 <property name="max_length">4</property>
                 <property name="placeholder_text" translatable="yes">0</property>
                 <property name="input_purpose">number</property>
@@ -96,7 +96,7 @@ Author: Novak Petrovic
               <object class="GtkEntry" id="p00">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="tooltip_text" translatable="yes">We suggest you use p = 0 for the starting value, but change it to suit your needs.</property>
+                <property name="tooltip_text" translatable="yes">We suggest you use p = 0 as the starting value, but change it to suit your needs.</property>
                 <property name="placeholder_text" translatable="yes">0</property>
                 <property name="input_purpose">number</property>
               </object>
@@ -352,11 +352,15 @@ Author: Novak Petrovic
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Q = k0 * t</property>
                 <property name="margin_top">4</property>
                 <property name="margin_bottom">4</property>
                 <property name="label" translatable="yes">Zero-order kinetics</property>
                 <attributes>
-                  <attribute name="font-desc" value="Sans Bold 12"/>
+                  <attribute name="font-desc" value="Sans Oblique 12"/>
+                  <attribute name="underline" value="True"/>
+                  <attribute name="foreground" value="#ffff00000000"/>
+                  <attribute name="underline-color" value="#ffff00000000"/>
                 </attributes>
               </object>
               <packing>
@@ -372,6 +376,9 @@ Author: Novak Petrovic
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
                 <property name="label" translatable="yes">k0</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -383,6 +390,9 @@ Author: Novak Petrovic
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Not calculated</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -395,7 +405,10 @@ Author: Novak Petrovic
                 <property name="can_focus">False</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
-                <property name="label" translatable="yes">rsq</property>
+                <property name="label" translatable="yes">r squared</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -407,6 +420,9 @@ Author: Novak Petrovic
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Not calculated</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -417,11 +433,15 @@ Author: Novak Petrovic
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Q = (1 - exp (-k1 * t)) * 100</property>
                 <property name="margin_top">4</property>
                 <property name="margin_bottom">4</property>
                 <property name="label" translatable="yes">First-order kinetics</property>
                 <attributes>
-                  <attribute name="font-desc" value="Sans Bold 12"/>
+                  <attribute name="font-desc" value="Sans Oblique 12"/>
+                  <attribute name="underline" value="True"/>
+                  <attribute name="foreground" value="#bfff3fff3fff"/>
+                  <attribute name="underline-color" value="#bfff3fff3fff"/>
                 </attributes>
               </object>
               <packing>
@@ -437,6 +457,9 @@ Author: Novak Petrovic
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
                 <property name="label" translatable="yes">k1</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -448,6 +471,9 @@ Author: Novak Petrovic
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Not calculated</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -460,7 +486,10 @@ Author: Novak Petrovic
                 <property name="can_focus">False</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
-                <property name="label" translatable="yes">rsq</property>
+                <property name="label" translatable="yes">r squared</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -472,6 +501,9 @@ Author: Novak Petrovic
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Not calculated</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -482,11 +514,15 @@ Author: Novak Petrovic
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Q = kh * sqrt (t)</property>
                 <property name="margin_top">4</property>
                 <property name="margin_bottom">4</property>
                 <property name="label" translatable="yes">Higuchi's equation</property>
                 <attributes>
-                  <attribute name="font-desc" value="Sans Bold 12"/>
+                  <attribute name="font-desc" value="Sans Oblique 12"/>
+                  <attribute name="underline" value="True"/>
+                  <attribute name="foreground" value="#0000ffff0000"/>
+                  <attribute name="underline-color" value="#0000ffff0000"/>
                 </attributes>
               </object>
               <packing>
@@ -502,6 +538,9 @@ Author: Novak Petrovic
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
                 <property name="label" translatable="yes">kh</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -513,6 +552,9 @@ Author: Novak Petrovic
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Not calculated</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -525,7 +567,10 @@ Author: Novak Petrovic
                 <property name="can_focus">False</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
-                <property name="label" translatable="yes">rsq</property>
+                <property name="label" translatable="yes">r squared</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -537,6 +582,9 @@ Author: Novak Petrovic
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Not calculated</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -547,11 +595,15 @@ Author: Novak Petrovic
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Q = k * t^n</property>
                 <property name="margin_top">4</property>
                 <property name="margin_bottom">4</property>
                 <property name="label" translatable="yes">Peppas' equation</property>
                 <attributes>
-                  <attribute name="font-desc" value="Sans Bold 12"/>
+                  <attribute name="font-desc" value="Sans Oblique 12"/>
+                  <attribute name="underline" value="True"/>
+                  <attribute name="foreground" value="#00000000ffff"/>
+                  <attribute name="underline-color" value="#00000000ffff"/>
                 </attributes>
               </object>
               <packing>
@@ -566,7 +618,10 @@ Author: Novak Petrovic
                 <property name="can_focus">False</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
-                <property name="label" translatable="yes">kp</property>
+                <property name="label" translatable="yes">k</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -578,6 +633,9 @@ Author: Novak Petrovic
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Not calculated</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -590,7 +648,10 @@ Author: Novak Petrovic
                 <property name="can_focus">False</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
-                <property name="label" translatable="yes">tn</property>
+                <property name="label" translatable="yes">n</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -602,6 +663,9 @@ Author: Novak Petrovic
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Not calculated</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -614,7 +678,10 @@ Author: Novak Petrovic
                 <property name="can_focus">False</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
-                <property name="label" translatable="yes">rsq</property>
+                <property name="label" translatable="yes">r squared</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -626,6 +693,9 @@ Author: Novak Petrovic
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Not calculated</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 10"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -843,6 +913,8 @@ Author: Novak Petrovic
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="margin_left">10</property>
+                    <property name="margin_right">10</property>
                     <property name="margin_top">4</property>
                     <property name="margin_bottom">4</property>
                   </object>
