@@ -100,10 +100,10 @@ struct app {
 	GtkWindow *window;
 	GtkWidget *ticks[NUMOF_MODELS];
 	struct models_params models_params_vals;
+	gboolean done_calculating_and_plotting;
 };
 
 static struct dp *data_set;
-static _Bool done_calculating_and_plotting = false;
 
 void help_version();
 void G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app);
@@ -126,7 +126,7 @@ int digits_only(char *entry);
 void
 G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
 {
-	if (done_calculating_and_plotting) {
+	if (app->done_calculating_and_plotting) {
 		slope_scale_remove_item(app->scale, app->series_md);
 		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[0]))) {
 			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[0]), FALSE);
@@ -171,7 +171,7 @@ G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
 	current_point->mins = atof(aux_t);
 	current_point->perc = atof(aux_p);
 	++numof_valid_pts;
-	_Bool found_the_end = false;
+	gboolean found_the_end = FALSE;
 	for (unsigned int i = 1; i < MAX_NUMOF_DATA_PTS && !found_the_end; ++i) {
 		aux_t = (char *)gtk_entry_get_text(GTK_ENTRY(app->time_entries[i]));
 		if (!digits_only(aux_t)) {
@@ -187,7 +187,7 @@ G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
 		}
 		if (atof(aux_t) == 0 || atof(aux_p) == 0 || strlen(aux_t) == 0
 			|| strlen(aux_p) == 0) {
-			found_the_end = true;
+			found_the_end = TRUE;
 		} else {
 			struct dp *dp_ = (struct dp *)g_malloc(sizeof(struct dp));
 			dp_->mins = atof(aux_t);
@@ -204,7 +204,7 @@ G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
 		/*Change this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 		fill_out_labels(app->models_params_vals, app);
 		generate_plots(app);
-		done_calculating_and_plotting = true;
+		app->done_calculating_and_plotting = TRUE;
 	} else {
 		show_msg_box(ERR_INSUFF_DATA_PTS, app->window);
 		gtk_widget_grab_focus(app->time_entries[numof_valid_pts]);
@@ -272,6 +272,7 @@ void load_and_start_gui(int argc, char *argv[])
 	g_signal_connect(app.ticks[2], "toggled", G_CALLBACK(on_tick_he_toggled), &app);
 	g_signal_connect(app.ticks[3], "toggled", G_CALLBACK(on_tick_pe_toggled), &app);
 	/*******/
+	app.done_calculating_and_plotting = FALSE;
 	g_object_unref(builder);
 	gtk_widget_show_all(GTK_WIDGET(app.window));
 	gtk_main();
@@ -361,7 +362,7 @@ G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app)
 		gtk_label_set_text(GTK_LABEL(app->models_params[i]), MSG_NOT_CALCED);
 	}
 	/*******/
-	if (done_calculating_and_plotting == 1) {
+	if (app->done_calculating_and_plotting) {
 		slope_scale_remove_item(app->scale, app->series_md);
 		/* Four -1's are key to clearing the graph properly!  */
 		slope_scale_set_layout_rect(app->scale, -1, -1, -1, -1);
@@ -370,7 +371,7 @@ G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app)
 		free(data_set);
 	}
 	/*******/
-	done_calculating_and_plotting = false;
+	app->done_calculating_and_plotting = FALSE;
 	return;
 }
 
@@ -378,7 +379,7 @@ G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app)
 void
 G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget *widget, struct app *app)
 {
-	if (done_calculating_and_plotting) {
+	if (app->done_calculating_and_plotting) {
 		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
 			slope_scale_remove_item(app->scale, app->series_zo);
 		} else {
@@ -397,7 +398,7 @@ G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget *widget, struct app *app)
 void
 G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget *widget, struct app *app)
 {
-	if (done_calculating_and_plotting) {
+	if (app->done_calculating_and_plotting) {
 		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
 			slope_scale_remove_item(app->scale, app->series_fo);
 		} else {
@@ -416,7 +417,7 @@ G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget *widget, struct app *app)
 void
 G_MODULE_EXPORT on_tick_he_toggled(GtkWidget *widget, struct app *app)
 {
-	if (done_calculating_and_plotting) {
+	if (app->done_calculating_and_plotting) {
 		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
 			slope_scale_remove_item(app->scale, app->series_he);
 		} else {
@@ -435,7 +436,7 @@ G_MODULE_EXPORT on_tick_he_toggled(GtkWidget *widget, struct app *app)
 void
 G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget *widget, struct app *app)
 {
-	if (done_calculating_and_plotting) {
+	if (app->done_calculating_and_plotting) {
 		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
 			slope_scale_remove_item(app->scale, app->series_pe);
 		} else {
@@ -472,7 +473,7 @@ G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget *widget, struct app *app)
 		gtk_label_set_text(GTK_LABEL(app->models_params[i]), MSG_NOT_CALCED);
 	}
 	/*******/
-	done_calculating_and_plotting = false;
+	app->done_calculating_and_plotting = FALSE;
 	return;
 }
 
