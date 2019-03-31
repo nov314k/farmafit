@@ -1,7 +1,10 @@
-Name arrays in singular.
+Name arrays in plural.
 
 beg 	= beginning
 btn		= button
+calc	= calculate
+calcn	= calculation
+calced	= calculated
 corr 	= correct
 eg 		= example
 eq 		= equation
