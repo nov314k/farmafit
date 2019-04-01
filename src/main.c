@@ -367,16 +367,16 @@ void read_data_set(struct app *app)
 	struct dp *dp;
 	struct dp *curr_point = app->data_set;
 	app->numof_valid_pts = 0;
-	char aux_t[STR_LEN_FOR_CONVERSION];
-	char aux_p[STR_LEN_FOR_CONVERSION];
+	char *aux_t = g_malloc(sizeof(*aux_t) * STR_LEN_FOR_CONVERSION);
+	char *aux_p = g_malloc(sizeof(*aux_p) * STR_LEN_FOR_CONVERSION);
 	/* First data point is special and has to be read separately  */
-	strcpy(aux_t, gtk_entry_get_text(GTK_ENTRY(app->time_entries[0])));
+	aux_t = g_strdup(gtk_entry_get_text(GTK_ENTRY(app->time_entries[0])));
 	if (!digits_only(aux_t)) {
 		show_msg_box(ERR_INCORR_ENTRY, app->window);
 		gtk_widget_grab_focus(app->time_entries[0]);
 		return;
 	}
-	strcpy(aux_p, gtk_entry_get_text(GTK_ENTRY(app->perc_entries[0])));
+	aux_p = g_strdup(gtk_entry_get_text(GTK_ENTRY(app->perc_entries[0])));
 	if (!digits_or_single_pt_only(aux_p)) {
 		show_msg_box(ERR_INCORR_ENTRY, app->window);
 		gtk_widget_grab_focus(app->perc_entries[0]);
@@ -388,13 +388,13 @@ void read_data_set(struct app *app)
 	/* Other data points can be read "normally"  */
 	gboolean found_the_end = FALSE;
 	for (unsigned int i = 1; i < MAX_NUMOF_DATA_PTS && !found_the_end; ++i) {
-		strcpy(aux_t, (char *)gtk_entry_get_text(GTK_ENTRY(app->time_entries[i])));
+		aux_t = g_strdup(gtk_entry_get_text(GTK_ENTRY(app->time_entries[i])));
 		if (!digits_only(aux_t)) {
 			show_msg_box(ERR_INCORR_ENTRY, app->window);
 			gtk_widget_grab_focus(app->time_entries[i]);
 			return;
 		}
-		strcpy(aux_p, (char *)gtk_entry_get_text(GTK_ENTRY(app->perc_entries[i])));
+		aux_p = g_strdup(gtk_entry_get_text(GTK_ENTRY(app->perc_entries[i])));
 		if (!digits_or_single_pt_only(aux_p)) {
 			show_msg_box(ERR_INCORR_ENTRY, app->window);
 			gtk_widget_grab_focus(app->perc_entries[i]);
@@ -417,6 +417,8 @@ void read_data_set(struct app *app)
 		show_msg_box(ERR_INSUFF_DATA_PTS, app->window);
 		gtk_widget_grab_focus(app->time_entries[app->numof_valid_pts]);
 	}
+	g_free(aux_t);
+	g_free(aux_p);
 	return;
 }
 
@@ -557,8 +559,7 @@ void clear_all_except_data_points(struct app *app)
 gboolean digits_only(char *entry)
 {
 	gboolean all_good_flag = TRUE;
-	size_t str_len = strlen(entry);
-	for (unsigned int i = 0; i < str_len; ++i) {
+	for (unsigned int i = 0; i < strlen(entry); ++i) {
 		if (!(isdigit(entry[i]))) {
 			return FALSE;
 		}
@@ -570,15 +571,14 @@ gboolean digits_or_single_pt_only(char *entry)
 {
 	gboolean all_good_flag = TRUE;
 	int numof_pts = 0;
-	size_t str_len = strlen(entry);
-	for (unsigned int i = 0; i < str_len; ++i) {
+	for (unsigned int i = 0; i < strlen(entry); ++i) {
 		if (entry[i] == '.')
 			++numof_pts;
 	}
 	if (numof_pts > 1) {
 		return FALSE;
 	}
-	for (unsigned int i = 0; i < str_len; ++i) {
+	for (unsigned int i = 0; i < strlen(entry); ++i) {
 		if (!(isdigit(entry[i]) || entry[i] == '.')) {
 			return FALSE;
 		}
