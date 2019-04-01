@@ -61,9 +61,8 @@ double fmf_variance(double *data, int size)
 	return variance;
 }
 
-void
-fmf_calc_linreg(double *independent, double *dependent, int size,
-				struct lr *linreg)
+void fmf_calc_linreg(double *independent, double *dependent, int size,
+					 struct lr *linreg)
 {
 	double independent_armean = fmf_armean(independent, size);
 	double dependent_armean = fmf_armean(dependent, size);

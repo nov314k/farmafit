@@ -39,8 +39,6 @@
 #include <string.h>
 #include <unistd.h>
 
-/* TODO Change over to double everywhiere, check atof */
-
 #define NUMOF_MODELS 4
 #define NUMOF_SERIES 5
 #define NUMOF_XY_VALS 7
@@ -60,20 +58,27 @@
 #define KEY_BOX "key_box"
 #define GLADE_FILE_NAME "farmafit.glade"
 static const char *time_entries_names[] = {
-	"t00", "t01", "t02", "t03", "t04", "t05", "t06", "t07", "t08", "t09", "t10", "t11"
+	"t00", "t01", "t02", "t03", "t04", "t05", "t06", "t07", "t08", "t09", "t10",
+	"t11"
 };
+
 static const char *perc_entries_names[] = {
-	"p00", "p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08", "p09", "p10", "p11"
+	"p00", "p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08", "p09", "p10",
+	"p11"
 };
+
 static const char *models_params_names[] = {
 	"k0", "rsq_k0", "k1", "rsq_k1", "kh", "rsq_kh", "k", "n", "rsq_k"
 };
-static const char *ticks_names[] ={
+
+static const char *ticks_names[] = {
 	"tick_zo", "tick_fo", "tick_he", "tick_pe"
 };
+
 static const double eg_data_time_vals[] = {
 	0, 15, 30, 45, 60, 90, 120, 150, 180, 240, 300, 360
 };
+
 static const double eg_data_perc_vals[] = {
 	0, 8.803, 11.935, 15.316, 19.195, 28.426,
 	35.830, 41.672, 49.569, 62.338, 72.883, 79.588
@@ -106,23 +111,25 @@ struct app {
 void print_help_version();
 void load_and_start_gui(int argc, char *argv[]);
 /* Using G_MODULE_EXPORT is critical for getting it to work on Windows  */
-void G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget *widget, struct app *app);
-void G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app);
-void G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app);
-void G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget *widget, struct app *app);
-void G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget *widget, struct app *app);
-void G_MODULE_EXPORT on_tick_he_toggled(GtkWidget *widget, struct app *app);
-void G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget *widget, struct app *app);
-void destroy(GtkWidget *window);
-gboolean delete_event(GtkWidget *window, GdkEvent *event);
+void G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget * widget,
+											struct app *app);
+void G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget * widget,
+												  struct app *app);
+void G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget * widget, struct app *app);
+void G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget * widget, struct app *app);
+void G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget * widget, struct app *app);
+void G_MODULE_EXPORT on_tick_he_toggled(GtkWidget * widget, struct app *app);
+void G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget * widget, struct app *app);
+void destroy(GtkWidget * window);
+gboolean delete_event(GtkWidget * window, GdkEvent * event);
 void read_data_set(struct app *app);
 void fill_out_labels(struct app *app);
 void generate_plots(struct app *app);
 void clear_data_points(struct app *app);
 void clear_all_except_data_points(struct app *app);
 gboolean digits_only(char *entry);
-gboolean digits_or_single_pt_only(char *);
-void G_MODULE_EXPORT show_msg_box(char *, GtkWindow *window);
+gboolean digits_or_single_pt_only(char *entry);
+void G_MODULE_EXPORT show_msg_box(char *msg_text, GtkWindow * window);
 
 int main(int argc, char **argv)
 {
@@ -196,38 +203,51 @@ void load_and_start_gui(int argc, char *argv[])
 	gtk_box_pack_start(GTK_BOX(box), app.view, TRUE, TRUE, 0);
 	/*** Load IO widgets ***/
 	for (int i = 0; i < MAX_NUMOF_DATA_PTS; ++i) {
-		app.time_entries[i] = GTK_WIDGET(gtk_builder_get_object(builder, time_entries_names[i]));
-		app.perc_entries[i] = GTK_WIDGET(gtk_builder_get_object(builder, perc_entries_names[i]));
+		app.time_entries[i] =
+			GTK_WIDGET(gtk_builder_get_object(builder, time_entries_names[i]));
+		app.perc_entries[i] =
+			GTK_WIDGET(gtk_builder_get_object(builder, perc_entries_names[i]));
 	}
 	gtk_entry_set_text(GTK_ENTRY(app.time_entries[0]), "0");
 	gtk_entry_set_text(GTK_ENTRY(app.perc_entries[0]), "0");
 	for (int i = 0; i < NUMOF_MODELS_PARAMS; ++i) {
-		app.models_params[i] = GTK_WIDGET(gtk_builder_get_object(builder, models_params_names[i]));
+		app.models_params[i] =
+			GTK_WIDGET(gtk_builder_get_object(builder, models_params_names[i]));
 	}
 	for (int i = 0; i < NUMOF_MODELS; ++i) {
-		app.ticks[i] = GTK_WIDGET(gtk_builder_get_object(builder, ticks_names[i]));
+		app.ticks[i] =
+			GTK_WIDGET(gtk_builder_get_object(builder, ticks_names[i]));
 	}
-    /*** Load buttons ***/
+	/*** Load buttons ***/
 	GtkWidget *btn_load_eg;
-	btn_load_eg = GTK_WIDGET(gtk_builder_get_object(builder, "btn_load_example"));
+	btn_load_eg =
+		GTK_WIDGET(gtk_builder_get_object(builder, "btn_load_example"));
 	GtkWidget *btn_calc_and_plot;
-	btn_calc_and_plot = GTK_WIDGET(gtk_builder_get_object(builder, "btn_calculate_and_plot"));
+	btn_calc_and_plot =
+		GTK_WIDGET(gtk_builder_get_object(builder, "btn_calculate_and_plot"));
 	GtkWidget *btn_clear;
 	btn_clear = GTK_WIDGET(gtk_builder_get_object(builder, "btn_clear"));
 	GtkWidget *btn_close;
 	btn_close = GTK_WIDGET(gtk_builder_get_object(builder, "btn_close"));
 	/*** Connect signals ***/
-	g_signal_connect(btn_load_eg, "clicked", G_CALLBACK(on_btn_load_eg_clicked), &app);
-	g_signal_connect(btn_calc_and_plot, "clicked", G_CALLBACK(on_btn_calc_and_plot_clicked), &app);
-	g_signal_connect(btn_clear, "clicked", G_CALLBACK(on_btn_clear_clicked), &app);
+	g_signal_connect(btn_load_eg, "clicked", G_CALLBACK(on_btn_load_eg_clicked),
+					 &app);
+	g_signal_connect(btn_calc_and_plot, "clicked",
+					 G_CALLBACK(on_btn_calc_and_plot_clicked), &app);
+	g_signal_connect(btn_clear, "clicked", G_CALLBACK(on_btn_clear_clicked),
+					 &app);
 	/* TODO Check the best way to exit the application  */
 	g_signal_connect(btn_close, "clicked", G_CALLBACK(destroy), NULL);
-	g_signal_connect (app.window, "destroy", G_CALLBACK(destroy), NULL);
-	g_signal_connect (app.window, "delete_event", G_CALLBACK (destroy), NULL);
-	g_signal_connect(app.ticks[0], "toggled", G_CALLBACK(on_tick_zo_toggled), &app);
-	g_signal_connect(app.ticks[1], "toggled", G_CALLBACK(on_tick_fo_toggled), &app);
-	g_signal_connect(app.ticks[2], "toggled", G_CALLBACK(on_tick_he_toggled), &app);
-	g_signal_connect(app.ticks[3], "toggled", G_CALLBACK(on_tick_pe_toggled), &app);
+	g_signal_connect(app.window, "destroy", G_CALLBACK(destroy), NULL);
+	g_signal_connect(app.window, "delete_event", G_CALLBACK(destroy), NULL);
+	g_signal_connect(app.ticks[0], "toggled", G_CALLBACK(on_tick_zo_toggled),
+					 &app);
+	g_signal_connect(app.ticks[1], "toggled", G_CALLBACK(on_tick_fo_toggled),
+					 &app);
+	g_signal_connect(app.ticks[2], "toggled", G_CALLBACK(on_tick_he_toggled),
+					 &app);
+	g_signal_connect(app.ticks[3], "toggled", G_CALLBACK(on_tick_pe_toggled),
+					 &app);
 	/*** Start application ***/
 	app.done_calculating_and_plotting = FALSE;
 	g_object_unref(builder);
@@ -236,24 +256,29 @@ void load_and_start_gui(int argc, char *argv[])
 	return;
 }
 
-void G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget *widget, struct app *app)
+void G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget * widget, struct app *app)
 {
-	if (widget == NULL) { /* suppress compiler warning */ }
+	if (widget == NULL) {		/* suppress compiler warning */
+	}
 	clear_all_except_data_points(app);
 	clear_data_points(app);
 	char number_as_string[STR_LEN_FOR_CONVERSION];
 	for (int i = 0; i < MAX_NUMOF_DATA_PTS; ++i) {
-		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.0f", eg_data_time_vals[i]);
+		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.0f",
+				 eg_data_time_vals[i]);
 		gtk_entry_set_text(GTK_ENTRY(app->time_entries[i]), number_as_string);
-		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.3f", eg_data_perc_vals[i]);
+		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.3f",
+				 eg_data_perc_vals[i]);
 		gtk_entry_set_text(GTK_ENTRY(app->perc_entries[i]), number_as_string);
 	}
 	return;
 }
 
-void G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
+void G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget * widget,
+												  struct app *app)
 {
-	if (widget == NULL) { /* suppress compiler warning */ }
+	if (widget == NULL) {		/* suppress compiler warning */
+	}
 	clear_all_except_data_points(app);
 	read_data_set(app);
 	//fmf_form_data_set ("example.json", data_set);
@@ -266,16 +291,17 @@ void G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app 
 	return;
 }
 
-void G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app)
+void G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget * widget, struct app *app)
 {
-	if (widget == NULL) { /* suppress compiler warning */ }
+	if (widget == NULL) {		/* suppress compiler warning */
+	}
 	clear_all_except_data_points(app);
 	clear_data_points(app);
 	return;
 }
 
 /* TODO Combine all on_tick_??_toggled callback functions into one  */
-void G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget *widget, struct app *app)
+void G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget * widget, struct app *app)
 {
 	if (app->done_calculating_and_plotting) {
 		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
@@ -284,7 +310,7 @@ void G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget *widget, struct app *app)
 			slope_scale_add_item(app->scale, app->series[1]);
 		}
 		slope_view_redraw(SLOPE_VIEW(app->view));
-	/* Condition (if) below is to prevent message box popping up twice.  */
+		/* Condition (if) below is to prevent message box popping up twice.  */
 	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
 	} else {
@@ -294,7 +320,7 @@ void G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget *widget, struct app *app)
 }
 
 /* TODO Combine all on_tick_??_toggled callback functions into one  */
-void G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget *widget, struct app *app)
+void G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget * widget, struct app *app)
 {
 	if (app->done_calculating_and_plotting) {
 		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
@@ -303,7 +329,7 @@ void G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget *widget, struct app *app)
 			slope_scale_add_item(app->scale, app->series[2]);
 		}
 		slope_view_redraw(SLOPE_VIEW(app->view));
-	/* Condition (if) below is to prevent message box popping up twice.  */
+		/* Condition (if) below is to prevent message box popping up twice.  */
 	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
 	} else {
@@ -313,7 +339,7 @@ void G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget *widget, struct app *app)
 }
 
 /* TODO Combine all on_tick_??_toggled callback functions into one  */
-void G_MODULE_EXPORT on_tick_he_toggled(GtkWidget *widget, struct app *app)
+void G_MODULE_EXPORT on_tick_he_toggled(GtkWidget * widget, struct app *app)
 {
 	if (app->done_calculating_and_plotting) {
 		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
@@ -322,7 +348,7 @@ void G_MODULE_EXPORT on_tick_he_toggled(GtkWidget *widget, struct app *app)
 			slope_scale_add_item(app->scale, app->series[3]);
 		}
 		slope_view_redraw(SLOPE_VIEW(app->view));
-	/* Condition (if) below is to prevent message box popping up twice.  */
+		/* Condition (if) below is to prevent message box popping up twice.  */
 	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
 	} else {
@@ -332,7 +358,7 @@ void G_MODULE_EXPORT on_tick_he_toggled(GtkWidget *widget, struct app *app)
 }
 
 /* TODO Combine all on_tick_??_toggled callback functions into one  */
-void G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget *widget, struct app *app)
+void G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget * widget, struct app *app)
 {
 	if (app->done_calculating_and_plotting) {
 		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
@@ -341,7 +367,7 @@ void G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget *widget, struct app *app)
 			slope_scale_add_item(app->scale, app->series[4]);
 		}
 		slope_view_redraw(SLOPE_VIEW(app->view));
-	/* Condition (if) below is to prevent message box popping up twice.  */
+		/* Condition (if) below is to prevent message box popping up twice.  */
 	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
 	} else {
@@ -350,15 +376,17 @@ void G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget *widget, struct app *app)
 	return;
 }
 
-void destroy(GtkWidget *window)
+void destroy(GtkWidget * window)
 {
-	if (window == NULL) { /* suppress compiler warning */ }
+	if (window == NULL) {		/* suppress compiler warning */
+	}
 	gtk_main_quit();
 }
 
-gboolean delete_event(GtkWidget *window, GdkEvent *event)
+gboolean delete_event(GtkWidget * window, GdkEvent * event)
 {
-	if (window == NULL || event == NULL) { /* suppress compiler warning */ }
+	if (window == NULL || event == NULL) {	/* suppress compiler warning */
+	}
 	return FALSE;
 }
 
@@ -434,23 +462,31 @@ void fill_out_labels(struct app *app)
 {
 	/* TODO Consider changing struct models_params_vals into an array  */
 	char number[STR_LEN_FOR_CONVERSION];
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.k0);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f",
+			 app->models_params_vals.k0);
 	gtk_label_set_text(GTK_LABEL(app->models_params[0]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.rsq_k0);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f",
+			 app->models_params_vals.rsq_k0);
 	gtk_label_set_text(GTK_LABEL(app->models_params[1]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.k1);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f",
+			 app->models_params_vals.k1);
 	gtk_label_set_text(GTK_LABEL(app->models_params[2]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.rsq_k1);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f",
+			 app->models_params_vals.rsq_k1);
 	gtk_label_set_text(GTK_LABEL(app->models_params[3]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.kh);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f",
+			 app->models_params_vals.kh);
 	gtk_label_set_text(GTK_LABEL(app->models_params[4]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.rsq_kh);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f",
+			 app->models_params_vals.rsq_kh);
 	gtk_label_set_text(GTK_LABEL(app->models_params[5]), number);
 	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.k);
 	gtk_label_set_text(GTK_LABEL(app->models_params[6]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.tn);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f",
+			 app->models_params_vals.tn);
 	gtk_label_set_text(GTK_LABEL(app->models_params[7]), number);
-	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.rsq_k);
+	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f",
+			 app->models_params_vals.rsq_k);
 	gtk_label_set_text(GTK_LABEL(app->models_params[8]), number);
 	return;
 }
@@ -497,23 +533,32 @@ void generate_plots(struct app *app)
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
 		app->xy_vals[2][i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
 		app->xy_vals[3][i] = app->models_params_vals.k0 * app->xy_vals[2][i];
-		app->xy_vals[4][i] = (1 - exp(-1 * app->models_params_vals.k1 * app->xy_vals[2][i])) * 100;
-		app->xy_vals[5][i] = app->models_params_vals.kh * sqrt(app->xy_vals[2][i]);
+		app->xy_vals[4][i] =
+			(1 -
+			 exp(-1 * app->models_params_vals.k1 * app->xy_vals[2][i])) * 100;
+		app->xy_vals[5][i] =
+			app->models_params_vals.kh * sqrt(app->xy_vals[2][i]);
 		app->xy_vals[6][i] =
-			app->models_params_vals.k * pow(app->xy_vals[2][i], app->models_params_vals.tn);
+			app->models_params_vals.k * pow(app->xy_vals[2][i],
+											app->models_params_vals.tn);
 	}
 	app->series[1] =
-		slope_xyseries_new_filled(LBL_ZERO_ORDER_KINETICS, app->xy_vals[2], app->xy_vals[3], NUMOF_PLOT_PTS, "r-");
+		slope_xyseries_new_filled(LBL_ZERO_ORDER_KINETICS, app->xy_vals[2],
+								  app->xy_vals[3], NUMOF_PLOT_PTS, "r-");
 	app->series[2] =
-		slope_xyseries_new_filled(LBL_FIRST_ORDER_KINETICS, app->xy_vals[2], app->xy_vals[4], NUMOF_PLOT_PTS, "m-");
+		slope_xyseries_new_filled(LBL_FIRST_ORDER_KINETICS, app->xy_vals[2],
+								  app->xy_vals[4], NUMOF_PLOT_PTS, "m-");
 	app->series[3] =
-		slope_xyseries_new_filled(LBL_HIGUCHIS_EQUATION, app->xy_vals[2], app->xy_vals[5], NUMOF_PLOT_PTS, "g-");
+		slope_xyseries_new_filled(LBL_HIGUCHIS_EQUATION, app->xy_vals[2],
+								  app->xy_vals[5], NUMOF_PLOT_PTS, "g-");
 	app->series[4] =
-		slope_xyseries_new_filled(LBL_PEPPAS_EQUATION, app->xy_vals[2], app->xy_vals[6], NUMOF_PLOT_PTS, "b-");
+		slope_xyseries_new_filled(LBL_PEPPAS_EQUATION, app->xy_vals[2],
+								  app->xy_vals[6], NUMOF_PLOT_PTS, "b-");
 	/*** Setting up the graph ***/
 	SlopeItem *x_axis;
 	x_axis =
-		slope_xyscale_get_axis(SLOPE_XYSCALE(app->scale), SLOPE_XYSCALE_AXIS_BOTTOM);
+		slope_xyscale_get_axis(SLOPE_XYSCALE(app->scale),
+							   SLOPE_XYSCALE_AXIS_BOTTOM);
 	SlopeSampler *x_sampler;
 	/* TODO Check if x_axis can be declared to avoid casting  */
 	x_sampler = slope_xyaxis_get_sampler(SLOPE_XYAXIS(x_axis));
@@ -539,7 +584,8 @@ void clear_all_except_data_points(struct app *app)
 	if (app->done_calculating_and_plotting) {
 		for (int i = 0; i < NUMOF_MODELS; ++i) {
 			/* TODO Check if this will also clear lines on graph if plotted? */
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[i]), FALSE);
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[i]),
+										 FALSE);
 			/* [i + 1] is because series[0] is measured data (cleared below)  */
 			slope_scale_remove_item(app->scale, app->series[i + 1]);
 		}
@@ -548,7 +594,8 @@ void clear_all_except_data_points(struct app *app)
 		slope_scale_set_layout_rect(app->scale, -1, -1, -1, -1);
 		slope_view_redraw(SLOPE_VIEW(app->view));
 		for (int i = 0; i < NUMOF_MODELS_PARAMS; ++i) {
-			gtk_label_set_text(GTK_LABEL(app->models_params[i]), MSG_NOT_CALCED);
+			gtk_label_set_text(GTK_LABEL(app->models_params[i]),
+							   MSG_NOT_CALCED);
 		}
 		/* Free the memory in the linked list data_set  */
 		struct dp *curr;
@@ -598,7 +645,7 @@ gboolean digits_or_single_pt_only(char *entry)
 	return all_good_flag;
 }
 
-void G_MODULE_EXPORT show_msg_box(char *msg_text, GtkWindow *window)
+void G_MODULE_EXPORT show_msg_box(char *msg_text, GtkWindow * window)
 {
 	/* TODO Change localization so that "Close" button label is in English  */
 	GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
