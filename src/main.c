@@ -22,7 +22,7 @@
  * @file main.c
  * @author Novak Petrovic
  * @date 2019
- * @brief Main Farmafit function, and GUI functionality.
+ * @brief Main Farmafit function, and functionality.
  *
  * @see README (or README.md) for more details.
  */
@@ -223,7 +223,6 @@ void load_and_start_gui(int argc, char *argv[])
 	g_signal_connect(app.ticks[2], "toggled", G_CALLBACK(on_tick_he_toggled), &app);
 	g_signal_connect(app.ticks[3], "toggled", G_CALLBACK(on_tick_pe_toggled), &app);
 	/*** Start application ***/
-	app.data_set = (struct dp *)g_malloc(sizeof(struct dp));
 	app.done_calculating_and_plotting = FALSE;
 	g_object_unref(builder);
 	gtk_widget_show_all(GTK_WIDGET(app.window));
@@ -359,8 +358,10 @@ gboolean delete_event(GtkWidget *window, GdkEvent *event)
 
 void read_data_set(struct app *app)
 {
+	app->data_set = g_malloc(sizeof(*app->data_set));
 	fmf_init_data_set(app->data_set);
-	struct dp *current_point = app->data_set;
+	struct dp *dp;
+	struct dp *curr_point = app->data_set;
 	app->numof_valid_pts = 0;
 	char aux_t[STR_LEN_FOR_CONVERSION];
 	char aux_p[STR_LEN_FOR_CONVERSION];
@@ -377,8 +378,8 @@ void read_data_set(struct app *app)
 		gtk_widget_grab_focus(app->perc_entries[0]);
 		return;
 	}
-	current_point->mins = atof(aux_t);
-	current_point->perc = atof(aux_p);
+	curr_point->mins = atof(aux_t);
+	curr_point->perc = atof(aux_p);
 	++(app->numof_valid_pts);
 	/* Other data points can be read "normally"  */
 	gboolean found_the_end = FALSE;
@@ -399,12 +400,12 @@ void read_data_set(struct app *app)
 			|| strlen(aux_p) == 0) {
 			found_the_end = TRUE;
 		} else {
-			struct dp *dp = (struct dp *)g_malloc(sizeof(struct dp));
+			dp = g_malloc(sizeof(*dp));
 			dp->mins = atof(aux_t);
 			dp->perc = atof(aux_p);
-			current_point->next = dp;
-			current_point = dp;
-			current_point->next = NULL;
+			curr_point->next = dp;
+			curr_point = dp;
+			curr_point->next = NULL;
 			++(app->numof_valid_pts);
 		}
 	}
@@ -452,8 +453,8 @@ void generate_plots(struct app *app)
 	 * properly to the graph. They aslo have to be separate entities.  */
 	double *data_time_vals;
 	double *data_perc_vals;
-	data_time_vals = (double *)g_malloc(app->numof_valid_pts * sizeof(double));
-	data_perc_vals = (double *)g_malloc(app->numof_valid_pts * sizeof(double));
+	data_time_vals = g_malloc(sizeof(*data_time_vals) * app->numof_valid_pts);
+	data_perc_vals = g_malloc(sizeof(*data_perc_vals) * app->numof_valid_pts);
 	SlopeSample data_time_ticks[app->numof_valid_pts];
 	for (unsigned int i = 0; i < app->numof_valid_pts; ++i) {
 		data_time_vals[i] = curr_ptr->mins;
@@ -468,7 +469,7 @@ void generate_plots(struct app *app)
 		 * and make label point to the same place, since otherwise I get
 		 * the same labels on the x axis. It needs to be fixed.
 		 * Perhas changing it to an array of aux's is a solution?  */
-		aux = (char *)g_malloc(STR_LEN_FOR_CONVERSION * sizeof(char));
+		aux = g_malloc(sizeof(*aux) * STR_LEN_FOR_CONVERSION);
 		snprintf(aux, STR_LEN_FOR_CONVERSION, "%d", (int)data_time_vals[i]);
 		//strcpy(data_time_ticks[i].label, aux);
 		data_time_ticks[i].label = aux;
@@ -485,11 +486,11 @@ void generate_plots(struct app *app)
 	slope_scale_add_item(app->scale, app->series[0]);
 	/*** Series for four models ***/
 	double *x, *y_zo, *y_fo, *y_he, *y_pe;
-	x = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	y_zo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	y_fo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	y_he = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	y_pe = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	x = g_malloc(sizeof(*x) * NUMOF_PLOT_PTS);
+	y_zo = g_malloc(sizeof(*y_zo) * NUMOF_PLOT_PTS);
+	y_fo = g_malloc(sizeof(*y_fo) * NUMOF_PLOT_PTS);
+	y_he = g_malloc(sizeof(*y_he) * NUMOF_PLOT_PTS);
+	y_pe = g_malloc(sizeof(*y_pe) * NUMOF_PLOT_PTS);
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
 		x[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
 		y_zo[i] = app->models_params_vals.k0 * x[i];
@@ -550,7 +551,15 @@ void clear_all_except_data_points(struct app *app)
 		for (int i = 0; i < NUMOF_MODELS_PARAMS; ++i) {
 			gtk_label_set_text(GTK_LABEL(app->models_params[i]), MSG_NOT_CALCED);
 		}
+		/* Free the memory in the linked list data_set  */
+		struct dp *curr;
+		while (app->data_set != NULL) {
+			curr = app->data_set;
+			app->data_set = app->data_set->next;
+			g_free(curr);
+		}
 	}
+
 	app->done_calculating_and_plotting = FALSE;
 	return;
 }
