@@ -451,7 +451,7 @@ void generate_plots(struct app *app)
 	 * because it's only a pointer to a _single_ data point.  */
 	struct dp *curr_ptr = app->data_set;
 	int max_minutes = 0;
-	char *aux;
+	char aux[STR_LEN_FOR_CONVERSION];
 	/* Two values below have to be allocated like this, since otherwise
 	 * slope_xyseries_new_filled does not add them properly to the graph.
 	 * They also have to be separate entities.  */
@@ -465,16 +465,8 @@ void generate_plots(struct app *app)
 			max_minutes = app->xy_vals[0][i];
 		}
 		data_time_ticks[i].coord = app->xy_vals[0][i];
-		/* TODO This is  problematic!
-		 * strcpy(data_time_ticks[i].label, aux); does not work,
-		 * so every time I create a new aux (which is a char *),
-		 * and make label point to the same place, since otherwise I get
-		 * the same labels on the x axis. It needs to be fixed.
-		 * Perhas changing it to an array of aux's is a solution?  */
-		aux = g_malloc(sizeof(*aux) * STR_LEN_FOR_CONVERSION);
 		snprintf(aux, STR_LEN_FOR_CONVERSION, "%d", (int)app->xy_vals[0][i]);
-		//strcpy(data_time_ticks[i].label, aux);
-		data_time_ticks[i].label = aux;
+		data_time_ticks[i].label = g_strdup(aux);
 		curr_ptr = curr_ptr->next;
 	}
 	app->scale = slope_xyscale_new();
