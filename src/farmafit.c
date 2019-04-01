@@ -34,60 +34,60 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-float fmf_armean(float *data, int size)
+double fmf_armean(double *data, int size)
 {
-	float total = 0.0;
+	double total = 0.0;
 	for (int i = 0; i < size; total += data[i], i++) ;
 	return total / size;
 }
 
-float fmf_moprods(float *data1, float *data2, int size)
+double fmf_moprods(double *data1, double *data2, int size)
 {
-	float total = 0.0;
+	double total = 0.0;
 	for (int i = 0; i < size; total += (data1[i] * data2[i]), i++) ;
 	return total / size;
 }
 
-float fmf_variance(float *data, int size)
+double fmf_variance(double *data, int size)
 {
-	float squares[size];
+	double squares[size];
 	for (int i = 0; i < size; i++) {
 		squares[i] = pow(data[i], 2);
 	}
-	float mean_of_squares = fmf_armean(squares, size);
-	float mean = fmf_armean(data, size);
-	float square_of_mean = pow(mean, 2);
-	float variance = mean_of_squares - square_of_mean;
+	double mean_of_squares = fmf_armean(squares, size);
+	double mean = fmf_armean(data, size);
+	double square_of_mean = pow(mean, 2);
+	double variance = mean_of_squares - square_of_mean;
 	return variance;
 }
 
 void
-fmf_calc_linreg(float *independent, float *dependent, int size,
+fmf_calc_linreg(double *independent, double *dependent, int size,
 				struct lr *linreg)
 {
-	float independent_armean = fmf_armean(independent, size);
-	float dependent_armean = fmf_armean(dependent, size);
-	float mean_of_products = fmf_moprods(independent, dependent, size);
-	float independent_variance = fmf_variance(independent, size);
+	double independent_armean = fmf_armean(independent, size);
+	double dependent_armean = fmf_armean(dependent, size);
+	double mean_of_products = fmf_moprods(independent, dependent, size);
+	double independent_variance = fmf_variance(independent, size);
 	linreg->a =
 		(mean_of_products -
 		 independent_armean * dependent_armean) / independent_variance;
 	linreg->b = dependent_armean - (linreg->a * independent_armean);
 }
 
-float fmf_calc_rsq(float *x, float *y, int size)
+double fmf_calc_rsq(double *x, double *y, int size)
 {
-	float x_mean = fmf_armean(x, size);
-	float y_mean = fmf_armean(y, size);
-	float top = 0.0;
-	float bottom2x = 0.0;
-	float bottom2y = 0.0;
+	double x_mean = fmf_armean(x, size);
+	double y_mean = fmf_armean(y, size);
+	double top = 0.0;
+	double bottom2x = 0.0;
+	double bottom2y = 0.0;
 	for (int i = 0; i < size; i++) {
 		top += (x[i] - x_mean) * (y[i] - y_mean);
 		bottom2x += pow(x[i] - x_mean, 2);
 		bottom2y += pow(y[i] - y_mean, 2);
 	}
-	float r = top / sqrt(bottom2x * bottom2y);
+	double r = top / sqrt(bottom2x * bottom2y);
 	return pow(r, 2);
 }
 
@@ -163,8 +163,8 @@ struct models_params fmf_calc_params(struct dp *data_set)
 		numof_data_points++;
 		cur = cur->next;
 	}
-	float independent[numof_data_points];
-	float dependent[numof_data_points];
+	double independent[numof_data_points];
+	double dependent[numof_data_points];
 	int i = 0;
 	cur = data_set;
 	while (cur != NULL) {
@@ -179,8 +179,8 @@ struct models_params fmf_calc_params(struct dp *data_set)
 	models_params.k0 = linreg->a;
 	models_params.rsq_k0 =
 		fmf_calc_rsq(independent, dependent, numof_data_points);
-	float x_axis_shorter[numof_data_points - 1];
-	float y_axis_shorter[numof_data_points - 1];
+	double x_axis_shorter[numof_data_points - 1];
+	double y_axis_shorter[numof_data_points - 1];
 	for (int i = 0; i < numof_data_points - 1; i++) {
 		x_axis_shorter[i] = independent[i + 1];
 		y_axis_shorter[i] = log(dependent[i + 1]);
@@ -190,8 +190,8 @@ struct models_params fmf_calc_params(struct dp *data_set)
 	models_params.k1 = linreg->a;
 	models_params.rsq_k1 = fmf_calc_rsq(x_axis_shorter, y_axis_shorter,
 										numof_data_points - 1);
-	float x_axis[numof_data_points];
-	float y_axis[numof_data_points];
+	double x_axis[numof_data_points];
+	double y_axis[numof_data_points];
 	for (int i = 0; i < numof_data_points; i++) {
 		x_axis[i] = sqrt(independent[i]);
 		y_axis[i] = dependent[i];

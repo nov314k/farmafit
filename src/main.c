@@ -39,6 +39,8 @@
 #include <string.h>
 #include <unistd.h>
 
+/* TODO Change over to double everywhiere, check atof */
+
 #define NUMOF_MODELS 4
 #define NUMOF_SERIES 5
 #define NUMOF_XY_VALS 7

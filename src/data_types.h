@@ -36,8 +36,8 @@
  * @param perc Percentage of the substance dissolved (dependent variable).
  */
 struct dp {
-	float mins;
-	float perc;
+	double mins;
+	double perc;
 	struct dp *next;
 };
 
@@ -48,8 +48,8 @@ struct dp {
  * @param b Intercept point.
  */
 struct lr {
-	float a;
-	float b;
+	double a;
+	double b;
 };
 
 /**
@@ -66,15 +66,15 @@ struct lr {
  * @param rsq_k  r-squared value for Peppas' model
  */
 struct models_params {
-	float k0;
-	float k1;
-	float kh;
-	float k;
-	float tn;
-	float rsq_k0;
-	float rsq_k1;
-	float rsq_kh;
-	float rsq_k;
+	double k0;
+	double k1;
+	double kh;
+	double k;
+	double tn;
+	double rsq_k0;
+	double rsq_k1;
+	double rsq_kh;
+	double rsq_k;
 };
 
 #endif							/* #ifndef DATA_TYPES_H  */

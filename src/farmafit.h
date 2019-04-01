@@ -41,7 +41,7 @@ struct lr;
  * @param[in] size Number of data points
  * @return Arithmetic mean of data
  */
-float fmf_armean(float *data, int size);
+double fmf_armean(double *data, int size);
 
 /**
  * @brief Calculates mean of products.
@@ -52,7 +52,7 @@ float fmf_armean(float *data, int size);
  * @return Mean of products
  * @note Number of data points in data1 and data2 must be the same.
  */
-float fmf_moprods(float *data1, float *data2, int size);
+double fmf_moprods(double *data1, double *data2, int size);
 
 /**
  * @brief Calculates variance.
@@ -61,7 +61,7 @@ float fmf_moprods(float *data1, float *data2, int size);
  * @param[in] size Number of data points
  * @return Variance
  */
-float fmf_variance(float *data, int size);
+double fmf_variance(double *data, int size);
 
 /**
  * @brief Uses linear regression to calculate slope and intercept.
@@ -72,7 +72,7 @@ float fmf_variance(float *data, int size);
  * @param[out] linreg Pointer to lr (linear regression) struct to hold the result
  * @return void
  */
-void fmf_calc_linreg(float *independent, float *dependent, int size,
+void fmf_calc_linreg(double *independent, double *dependent, int size,
 					 struct lr *linreg);
 
 /**
@@ -83,7 +83,7 @@ void fmf_calc_linreg(float *independent, float *dependent, int size,
  * @param[in] size Number of data points
  * @return Value of r squared
  */
-float fmf_calc_rsq(float *x, float *y, int size);
+double fmf_calc_rsq(double *x, double *y, int size);
 
 /**
  * @brief Gets data points.
