@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019 Novak Petrovic                                           * 
+ * Copyright (C) 2019 Novak Petrovic                                           *
  * <dev2[at]novak5[.]33mail[.]com>                                             *
  *                                                                             *
  * This file is part of Farmafit.                                              *

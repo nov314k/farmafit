@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019 Novak Petrovic                                           * 
+ * Copyright (C) 2019 Novak Petrovic                                           *
  * <dev2[at]novak5[.]33mail[.]com>                                             *
  *                                                                             *
  * This file is part of Farmafit.                                              *
@@ -23,18 +23,20 @@
  * @author Novak Petrovic
  * @date 2019
  * @brief Header file for farmafit.c.
- * 
+ *
  * @see README (or README.md) for more details.
  */
 #ifndef FARMAFIT_H
 #define FARMAFIT_H
 
+#define VALUE_NOT_SET -1.0
+
 struct dp;
 struct lr;
 
-/**                                                                            
+/**
  * @brief Calculates arithmetic mean.
- * 
+ *
  * @param[in] data Values for which to calculate arithmetic mean
  * @param[in] size Number of data points
  * @return Arithmetic mean of data
@@ -43,7 +45,7 @@ float fmf_armean(float *data, int size);
 
 /**
  * @brief Calculates mean of products.
- * 
+ *
  * @param[in] data1 Data set 1
  * @param[in] data2 Data set 2
  * @param[in] size Number of data points
@@ -54,7 +56,7 @@ float fmf_moprods(float *data1, float *data2, int size);
 
 /**
  * @brief Calculates variance.
- * 
+ *
  * @param[in] data Data set for which to calculate variance
  * @param[in] size Number of data points
  * @return Variance
@@ -87,7 +89,7 @@ float fmf_calc_rsq(float *x, float *y, int size);
  * @brief Gets data points.
  *
  * @param[in] data_str All data from JSON file as a string
- * @param[in,out] head Pointer to the first element of the linked list 
+ * @param[in,out] head Pointer to the first element of the linked list
  *                     which contains measurement points (from JSON file)
  * @return Error code (to be documented)
  */
@@ -96,14 +98,14 @@ int fmf_gtdpts(const char *const data_str, struct dp *head);
 /**
  * @brief Calculates all model parameters, including r-squared values
  * @param[in] file_name Name of the experimental measurements file
- * @return Structure containing parameters for all models 
+ * @return Structure containing parameters for all models
  */
 struct models_params fmf_calc_params(struct dp *data_set);
 
 /*
  * @brief Prints all model parameters, includin r-squared values
  * @param[in] file_name Name of the experimental measurements file
- * @return void 
+ * @return void
  */
 void fmf_print_params(char *file_name);
 

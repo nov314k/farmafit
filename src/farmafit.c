@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019 Novak Petrovic                                           * 
+ * Copyright (C) 2019 Novak Petrovic                                           *
  * <dev2[at]novak5[.]33mail[.]com>                                             *
  *                                                                             *
  * This file is part of Farmafit.                                              *
@@ -27,13 +27,11 @@
  * @see farmafit.h for descriptions of parameters and return values.
  * @see README (or README.md) for more details.
  */
-#include "globdefs.h"
 #include "data_types.h"
 #include "farmafit.h"
-#include "../lib/cJSON/cJSON.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 float fmf_armean(float *data, int size)
 {

@@ -26,19 +26,18 @@
  *
  * @see README (or README.md) for more details.
  */
-#include "globdefs.h"
 #include "data_types.h"
 #include "farmafit.h"
 #include <slope/slope.h>
 #include <gtk/gtk.h>
-#include <ctype.h>
-#include <unistd.h>
-#include <string.h>
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
 #include <assert.h>
+#include <ctype.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #define NUMOF_MODELS 4
 #define NUMOF_SERIES 5
