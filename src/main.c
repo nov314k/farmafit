@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #define NUMOF_MODELS 4
 #define NUMOF_SERIES 5
@@ -219,9 +220,9 @@ void load_and_start_gui(int argc, char *argv[])
 	g_signal_connect(btn_calc_and_plot, "clicked", G_CALLBACK(on_btn_calc_and_plot_clicked), &app);
 	g_signal_connect(btn_clear, "clicked", G_CALLBACK(on_btn_clear_clicked), &app);
 	/* TODO Check the best way to exit the application  */
-	g_signal_connect(btn_close, "clicked", G_CALLBACK(gtk_main_quit), NULL);
+	g_signal_connect(btn_close, "clicked", G_CALLBACK(destroy), NULL);
 	g_signal_connect (app.window, "destroy", G_CALLBACK(destroy), NULL);
-	g_signal_connect (app.window, "delete_event", G_CALLBACK (delete_event), NULL);
+	g_signal_connect (app.window, "delete_event", G_CALLBACK (destroy), NULL);
 	g_signal_connect(app.ticks[0], "toggled", G_CALLBACK(on_tick_zo_toggled), &app);
 	g_signal_connect(app.ticks[1], "toggled", G_CALLBACK(on_tick_fo_toggled), &app);
 	g_signal_connect(app.ticks[2], "toggled", G_CALLBACK(on_tick_he_toggled), &app);
@@ -363,12 +364,15 @@ gboolean delete_event(GtkWidget *window, GdkEvent *event)
 void read_data_set(struct app *app)
 {
 	app->data_set = g_malloc(sizeof(*app->data_set));
+	assert(NULL != app->data_set);
 	fmf_init_data_set(app->data_set);
 	struct dp *dp;
 	struct dp *curr_point = app->data_set;
 	app->numof_valid_pts = 0;
 	char *aux_t = g_malloc(sizeof(*aux_t) * STR_LEN_FOR_CONVERSION);
+	assert(NULL != aux_t);
 	char *aux_p = g_malloc(sizeof(*aux_p) * STR_LEN_FOR_CONVERSION);
+	assert(NULL != aux_p);
 	/* First data point is special and has to be read separately  */
 	aux_t = g_strdup(gtk_entry_get_text(GTK_ENTRY(app->time_entries[0])));
 	if (!digits_only(aux_t)) {
@@ -405,6 +409,7 @@ void read_data_set(struct app *app)
 			found_the_end = TRUE;
 		} else {
 			dp = g_malloc(sizeof(*dp));
+			assert(NULL != dp);
 			dp->mins = atof(aux_t);
 			dp->perc = atof(aux_p);
 			curr_point->next = dp;
@@ -418,7 +423,9 @@ void read_data_set(struct app *app)
 		gtk_widget_grab_focus(app->time_entries[app->numof_valid_pts]);
 	}
 	g_free(aux_t);
+	aux_t = NULL;
 	g_free(aux_p);
+	aux_p = NULL;
 	return;
 }
 
@@ -458,7 +465,9 @@ void generate_plots(struct app *app)
 	 * slope_xyseries_new_filled does not add them properly to the graph.
 	 * They also have to be separate entities.  */
 	app->xy_vals[0] = g_malloc(sizeof(*app->xy_vals[0]) * app->numof_valid_pts);
+	assert(NULL != app->xy_vals[0]);
 	app->xy_vals[1] = g_malloc(sizeof(*app->xy_vals[1]) * app->numof_valid_pts);
+	assert(NULL != app->xy_vals[1]);
 	SlopeSample data_time_ticks[app->numof_valid_pts];
 	for (unsigned int i = 0; i < app->numof_valid_pts; ++i) {
 		app->xy_vals[0][i] = curr_ptr->mins;
@@ -475,7 +484,6 @@ void generate_plots(struct app *app)
 	/* TODO Check if SLOPE_FIGURE is really needed  */
 	slope_figure_add_scale(SLOPE_FIGURE(app->figure), app->scale);
 	slope_scale_set_layout_rect(app->scale, 0, 0, 1, 1);
-	/* TODO Consider free-ing everywhere  */
 	app->series[0] =
 		slope_xyseries_new_filled(LBL_MEASURED_DATA, app->xy_vals[0],
 								  app->xy_vals[1], app->numof_valid_pts, "kor");
@@ -483,6 +491,7 @@ void generate_plots(struct app *app)
 	/*** Series for four models ***/
 	for (int i = 2; i < NUMOF_XY_VALS; ++i) {
 		app->xy_vals[i] = g_malloc(sizeof(*app->xy_vals[i]) * NUMOF_PLOT_PTS);
+		assert(NULL != app->xy_vals[i]);
 	}
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
 		app->xy_vals[2][i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
@@ -547,9 +556,11 @@ void clear_all_except_data_points(struct app *app)
 			app->data_set = app->data_set->next;
 			g_free(curr);
 		}
+		app->data_set = NULL;
 		/* Free xy_vals memory  */
 		for (int i = 0; i < NUMOF_XY_VALS; ++i) {
 			g_free(app->xy_vals[i]);
+			app->xy_vals[i] = NULL;
 		}
 	}
 	app->done_calculating_and_plotting = FALSE;
