@@ -22,7 +22,7 @@
  * @file main.c
  * @author Novak Petrovic
  * @date 2019
- * @brief Main Farmafit function, and functionality.
+ * @brief Main Farmafit function, and the graphical user interface.
  *
  * @see README (or README.md) for more details.
  */
