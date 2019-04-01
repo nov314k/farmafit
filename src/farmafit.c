@@ -29,7 +29,7 @@
  */
 #include "data_types.h"
 #include "farmafit.h"
-#include "../lib/cJSON/cJSON.h"
+#include <cJSON.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
