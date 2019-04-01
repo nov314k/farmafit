@@ -479,57 +479,34 @@ void generate_plots(struct app *app)
 	slope_figure_add_scale(SLOPE_FIGURE(app->figure), app->scale);
 	slope_scale_set_layout_rect(app->scale, 0, 0, 1, 1);
 	/* TODO Consider free-ing everywhere  */
-	if (app->done_calculating_and_plotting) {
-		free(app->series[0]);
-	}
 	app->series[0] =
 		slope_xyseries_new_filled(LBL_MEASURED_DATA, data_time_vals,
 								  data_perc_vals, app->numof_valid_pts, "kor");
 	slope_scale_add_item(app->scale, app->series[0]);
-	/*** Zero-order kinetics ***/
-	double *x, *x_zo, *y_zo;
+	/*** Series for four models ***/
+	double *x, *y_zo, *y_fo, *y_he, *y_pe;
 	x = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	x_zo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	y_zo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	y_fo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	y_he = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	y_pe = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
 		x[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
-		x_zo[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_zo[i] = app->models_params_vals.k0 * x_zo[i];
+		y_zo[i] = app->models_params_vals.k0 * x[i];
+		y_fo[i] = (1 - exp(-1 * app->models_params_vals.k1 * x[i])) * 100;
+		y_he[i] = app->models_params_vals.kh * sqrt(x[i]);
+		y_pe[i] =
+			app->models_params_vals.k * pow(x[i], app->models_params_vals.tn);
 	}
 	app->series[1] =
 		slope_xyseries_new_filled(LBL_ZERO_ORDER_KINETICS, x, y_zo,
 								  NUMOF_PLOT_PTS, "r-");
-	/*** First-order kinetics ***/
-	double *x_fo, *y_fo;
-	x_fo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	y_fo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
-		x_fo[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_fo[i] = (1 - exp(-1 * app->models_params_vals.k1 * x_fo[i])) * 100;
-	}
 	app->series[2] =
 		slope_xyseries_new_filled(LBL_FIRST_ORDER_KINETICS, x, y_fo,
 								  NUMOF_PLOT_PTS, "m-");
-	/*** Higuchi's equation ***/
-	double *x_he, *y_he;
-	x_he = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	y_he = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
-		x_he[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_he[i] = app->models_params_vals.kh * sqrt(x_he[i]);
-	}
 	app->series[3] =
 		slope_xyseries_new_filled(LBL_HIGUCHIS_EQUATION, x, y_he,
 								  NUMOF_PLOT_PTS, "g-");
-	/*** Peppas' equation ***/
-	double *x_pe, *y_pe;
-	x_pe = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	y_pe = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
-		x_pe[i] = (double)i *max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_pe[i] =
-			app->models_params_vals.k * pow(x_pe[i], app->models_params_vals.tn);
-	}
 	app->series[4] =
 		slope_xyseries_new_filled(LBL_PEPPAS_EQUATION, x, y_pe,
 								  NUMOF_PLOT_PTS, "b-");

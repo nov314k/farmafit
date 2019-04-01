@@ -2,6 +2,9 @@
 
 ## Short-term todos
 
+Run valgrind
+Use other suitable g_ functions
+Ask whether Slope objects need to be freed/unreferenced?
 Create an installer with http://www.jrsoftware.org/isinfo.php (Inno)
 Investigate DLLs neede to run this outside of MSYS2
 Investigate packing this tightly into a single file
