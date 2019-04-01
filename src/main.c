@@ -39,13 +39,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-/*
- * TODO Change variable names to suit standard names
- * TODO Check all places where creation of new objects is done
- **/
-
 #define NUMOF_MODELS 4
 #define NUMOF_SERIES 5
+#define NUMOF_XY_VALS 7
 #define NUMOF_PLOT_PTS 101
 #define NUMOF_MODELS_PARAMS 9
 #define MAX_NUMOF_DATA_PTS 12
@@ -81,6 +77,13 @@ static const double eg_data_perc_vals[] = {
 	35.830, 41.672, 49.569, 62.338, 72.883, 79.588
 };
 
+/* xy_vals[0] is a pointer to the measured x-axis data
+ * xy_vals[1] is a pointer to the measured y-axis data
+ * xy_vals[2] is a pointer to models x-axis data (valid for all models)
+ * xy_vals[3] is a pointer to zo model y-axis data
+ * xy_vals[4] is a pointer to fo model y-axis data
+ * xy_vals[5] is a pointer to he model y-axis data
+ * xy_vals[6] is a pointer to pe model y-axis data  */
 struct app {
 	GtkWidget *view;
 	SlopeScale *scale;
@@ -92,6 +95,7 @@ struct app {
 	GtkWidget *models_params[NUMOF_MODELS_PARAMS];
 	GtkWindow *window;
 	struct dp *data_set;
+	double *xy_vals[NUMOF_XY_VALS];
 	struct models_params models_params_vals;
 	unsigned int numof_valid_pts;
 	gboolean done_calculating_and_plotting;
@@ -448,21 +452,19 @@ void generate_plots(struct app *app)
 	struct dp *curr_ptr = app->data_set;
 	int max_minutes = 0;
 	char *aux;
-	/* Two values below have to be declared and constructed like this.
-	 * since otherwise slope_xyseries_new_filled does not add them
-	 * properly to the graph. They aslo have to be separate entities.  */
-	double *data_time_vals;
-	double *data_perc_vals;
-	data_time_vals = g_malloc(sizeof(*data_time_vals) * app->numof_valid_pts);
-	data_perc_vals = g_malloc(sizeof(*data_perc_vals) * app->numof_valid_pts);
+	/* Two values below have to be allocated like this, since otherwise
+	 * slope_xyseries_new_filled does not add them properly to the graph.
+	 * They also have to be separate entities.  */
+	app->xy_vals[0] = g_malloc(sizeof(*app->xy_vals[0]) * app->numof_valid_pts);
+	app->xy_vals[1] = g_malloc(sizeof(*app->xy_vals[1]) * app->numof_valid_pts);
 	SlopeSample data_time_ticks[app->numof_valid_pts];
 	for (unsigned int i = 0; i < app->numof_valid_pts; ++i) {
-		data_time_vals[i] = curr_ptr->mins;
-		data_perc_vals[i] = curr_ptr->perc;
-		if (data_time_vals[i] > max_minutes) {
-			max_minutes = data_time_vals[i];
+		app->xy_vals[0][i] = curr_ptr->mins;
+		app->xy_vals[1][i] = curr_ptr->perc;
+		if (app->xy_vals[0][i] > max_minutes) {
+			max_minutes = app->xy_vals[0][i];
 		}
-		data_time_ticks[i].coord = data_time_vals[i];
+		data_time_ticks[i].coord = app->xy_vals[0][i];
 		/* TODO This is  problematic!
 		 * strcpy(data_time_ticks[i].label, aux); does not work,
 		 * so every time I create a new aux (which is a char *),
@@ -470,7 +472,7 @@ void generate_plots(struct app *app)
 		 * the same labels on the x axis. It needs to be fixed.
 		 * Perhas changing it to an array of aux's is a solution?  */
 		aux = g_malloc(sizeof(*aux) * STR_LEN_FOR_CONVERSION);
-		snprintf(aux, STR_LEN_FOR_CONVERSION, "%d", (int)data_time_vals[i]);
+		snprintf(aux, STR_LEN_FOR_CONVERSION, "%d", (int)app->xy_vals[0][i]);
 		//strcpy(data_time_ticks[i].label, aux);
 		data_time_ticks[i].label = aux;
 		curr_ptr = curr_ptr->next;
@@ -481,36 +483,29 @@ void generate_plots(struct app *app)
 	slope_scale_set_layout_rect(app->scale, 0, 0, 1, 1);
 	/* TODO Consider free-ing everywhere  */
 	app->series[0] =
-		slope_xyseries_new_filled(LBL_MEASURED_DATA, data_time_vals,
-								  data_perc_vals, app->numof_valid_pts, "kor");
+		slope_xyseries_new_filled(LBL_MEASURED_DATA, app->xy_vals[0],
+								  app->xy_vals[1], app->numof_valid_pts, "kor");
 	slope_scale_add_item(app->scale, app->series[0]);
 	/*** Series for four models ***/
-	double *x, *y_zo, *y_fo, *y_he, *y_pe;
-	x = g_malloc(sizeof(*x) * NUMOF_PLOT_PTS);
-	y_zo = g_malloc(sizeof(*y_zo) * NUMOF_PLOT_PTS);
-	y_fo = g_malloc(sizeof(*y_fo) * NUMOF_PLOT_PTS);
-	y_he = g_malloc(sizeof(*y_he) * NUMOF_PLOT_PTS);
-	y_pe = g_malloc(sizeof(*y_pe) * NUMOF_PLOT_PTS);
+	for (int i = 2; i < NUMOF_XY_VALS; ++i) {
+		app->xy_vals[i] = g_malloc(sizeof(*app->xy_vals[i]) * NUMOF_PLOT_PTS);
+	}
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
-		x[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_zo[i] = app->models_params_vals.k0 * x[i];
-		y_fo[i] = (1 - exp(-1 * app->models_params_vals.k1 * x[i])) * 100;
-		y_he[i] = app->models_params_vals.kh * sqrt(x[i]);
-		y_pe[i] =
-			app->models_params_vals.k * pow(x[i], app->models_params_vals.tn);
+		app->xy_vals[2][i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
+		app->xy_vals[3][i] = app->models_params_vals.k0 * app->xy_vals[2][i];
+		app->xy_vals[4][i] = (1 - exp(-1 * app->models_params_vals.k1 * app->xy_vals[2][i])) * 100;
+		app->xy_vals[5][i] = app->models_params_vals.kh * sqrt(app->xy_vals[2][i]);
+		app->xy_vals[6][i] =
+			app->models_params_vals.k * pow(app->xy_vals[2][i], app->models_params_vals.tn);
 	}
 	app->series[1] =
-		slope_xyseries_new_filled(LBL_ZERO_ORDER_KINETICS, x, y_zo,
-								  NUMOF_PLOT_PTS, "r-");
+		slope_xyseries_new_filled(LBL_ZERO_ORDER_KINETICS, app->xy_vals[2], app->xy_vals[3], NUMOF_PLOT_PTS, "r-");
 	app->series[2] =
-		slope_xyseries_new_filled(LBL_FIRST_ORDER_KINETICS, x, y_fo,
-								  NUMOF_PLOT_PTS, "m-");
+		slope_xyseries_new_filled(LBL_FIRST_ORDER_KINETICS, app->xy_vals[2], app->xy_vals[4], NUMOF_PLOT_PTS, "m-");
 	app->series[3] =
-		slope_xyseries_new_filled(LBL_HIGUCHIS_EQUATION, x, y_he,
-								  NUMOF_PLOT_PTS, "g-");
+		slope_xyseries_new_filled(LBL_HIGUCHIS_EQUATION, app->xy_vals[2], app->xy_vals[5], NUMOF_PLOT_PTS, "g-");
 	app->series[4] =
-		slope_xyseries_new_filled(LBL_PEPPAS_EQUATION, x, y_pe,
-								  NUMOF_PLOT_PTS, "b-");
+		slope_xyseries_new_filled(LBL_PEPPAS_EQUATION, app->xy_vals[2], app->xy_vals[6], NUMOF_PLOT_PTS, "b-");
 	/*** Setting up the graph ***/
 	SlopeItem *x_axis;
 	x_axis =
@@ -558,8 +553,11 @@ void clear_all_except_data_points(struct app *app)
 			app->data_set = app->data_set->next;
 			g_free(curr);
 		}
+		/* Free xy_vals memory  */
+		for (int i = 0; i < NUMOF_XY_VALS; ++i) {
+			g_free(app->xy_vals[i]);
+		}
 	}
-
 	app->done_calculating_and_plotting = FALSE;
 	return;
 }
