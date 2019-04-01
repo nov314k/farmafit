@@ -2,6 +2,7 @@
 
 ## For next version
 
+Do not add doxygen docs to git
 Create an installer with http://www.jrsoftware.org/isinfo.php (Inno)
 Run valgrind
 Ask whether Slope objects need to be freed/unreferenced
