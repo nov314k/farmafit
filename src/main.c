@@ -22,7 +22,7 @@
  * @file main.c
  * @author Novak Petrovic
  * @date 2019
- * @brief Main Farmafit function.
+ * @brief Main Farmafit function, and GUI functionality.
  *
  * @see README (or README.md) for more details.
  */
@@ -41,11 +41,11 @@
 
 /*
  * TODO Change variable names to suit standard names
- * TODO Check if all proper Gtk types are used, to reduce type casting
  * TODO Check all places where creation of new objects is done
  **/
 
 #define NUMOF_MODELS 4
+#define NUMOF_SERIES 5
 #define NUMOF_PLOT_PTS 101
 #define NUMOF_MODELS_PARAMS 9
 #define MAX_NUMOF_DATA_PTS 12
@@ -82,14 +82,10 @@ static const double eg_data_perc_vals[] = {
 };
 
 struct app {
+	GtkWidget *view;
 	SlopeScale *scale;
 	SlopeFigure *figure;
-	SlopeItem *series_md;
-	SlopeItem *series_pe;
-	SlopeItem *series_zo;
-	SlopeItem *series_fo;
-	SlopeItem *series_he;
-	GtkWidget *view;
+	SlopeItem *series[NUMOF_SERIES];
 	GtkWidget *ticks[NUMOF_MODELS];
 	GtkWidget *time_entries[MAX_NUMOF_DATA_PTS];
 	GtkWidget *perc_entries[MAX_NUMOF_DATA_PTS];
@@ -101,95 +97,78 @@ struct app {
 	gboolean done_calculating_and_plotting;
 };
 
-void help_version();
-void G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app);
+void print_help_version();
+void load_and_start_gui(int argc, char *argv[]);
+/* Using G_MODULE_EXPORT is critical for getting it to work on Windows  */
 void G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget *widget, struct app *app);
+void G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app);
+void G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app);
 void G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget *widget, struct app *app);
 void G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget *widget, struct app *app);
 void G_MODULE_EXPORT on_tick_he_toggled(GtkWidget *widget, struct app *app);
 void G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget *widget, struct app *app);
-
-void destroy (GtkWidget *window);
+void destroy(GtkWidget *window);
 gboolean delete_event(GtkWidget *window, GdkEvent *event);
-
-void generate_plots(struct app *app);
+void read_data_set(struct app *app);
 void fill_out_labels(struct app *app);
-
-void G_MODULE_EXPORT show_msg_box(char *, GtkWindow *window);
-gboolean digits_or_single_pt_only(char *);
-gboolean digits_only(char *entry);
-void clear_all_except_data_points(struct app *app);
+void generate_plots(struct app *app);
 void clear_data_points(struct app *app);
+void clear_all_except_data_points(struct app *app);
+gboolean digits_only(char *entry);
+gboolean digits_or_single_pt_only(char *);
+void G_MODULE_EXPORT show_msg_box(char *, GtkWindow *window);
 
-void read_data_set(struct app *app)
+int main(int argc, char **argv)
 {
-	fmf_init_data_set(app->data_set);
-	struct dp *current_point = app->data_set;
-	app->numof_valid_pts = 0;
-	char aux_t[STR_LEN_FOR_CONVERSION];
-	char aux_p[STR_LEN_FOR_CONVERSION];
-	/* Cast from const char * to avoid compiler warnings  */
-	strcpy(aux_t, (char *)gtk_entry_get_text(GTK_ENTRY(app->time_entries[0])));
-	if (!digits_only(aux_t)) {
-		show_msg_box(ERR_INCORR_ENTRY, app->window);
-		gtk_widget_grab_focus(app->time_entries[0]);
-		return;
-	}
-	strcpy(aux_p, (char *)gtk_entry_get_text(GTK_ENTRY(app->perc_entries[0])));
-	if (!digits_or_single_pt_only(aux_p)) {
-		show_msg_box(ERR_INCORR_ENTRY, app->window);
-		gtk_widget_grab_focus(app->perc_entries[0]);
-		return;
-	}
-	current_point->mins = atof(aux_t);
-	current_point->perc = atof(aux_p);
-	++(app->numof_valid_pts);
-	gboolean found_the_end = FALSE;
-	for (unsigned int i = 1; i < MAX_NUMOF_DATA_PTS && !found_the_end; ++i) {
-		strcpy(aux_t, (char *)gtk_entry_get_text(GTK_ENTRY(app->time_entries[i])));
-		if (!digits_only(aux_t)) {
-			show_msg_box(ERR_INCORR_ENTRY, app->window);
-			gtk_widget_grab_focus(app->time_entries[i]);
-			return;
-		}
-		strcpy(aux_p, (char *)gtk_entry_get_text(GTK_ENTRY(app->perc_entries[i])));
-		if (!digits_or_single_pt_only(aux_p)) {
-			show_msg_box(ERR_INCORR_ENTRY, app->window);
-			gtk_widget_grab_focus(app->perc_entries[i]);
-			return;
-		}
-		if (atof(aux_t) == 0 || atof(aux_p) == 0 || strlen(aux_t) == 0
-			|| strlen(aux_p) == 0) {
-			found_the_end = TRUE;
-		} else {
-			struct dp *dp = (struct dp *)g_malloc(sizeof(struct dp));
-			dp->mins = atof(aux_t);
-			dp->perc = atof(aux_p);
-			current_point->next = dp;
-			current_point = dp;
-			current_point->next = NULL;
-			++(app->numof_valid_pts);
+	if (argc == 1) {
+		load_and_start_gui(argc, argv);
+		exit(EXIT_SUCCESS);
+	} else {
+		int c;
+		while ((c = getopt(argc, argv, "vhf:?")) != -1) {
+			switch (c) {
+			case 'v':
+				print_help_version();
+				exit(EXIT_SUCCESS);
+				break;
+			case 'h':
+				print_help_version();
+				exit(EXIT_SUCCESS);
+				break;
+			case 'f':
+				if (argc == 3) {
+					/* TODO Check if the supplied file exists  */
+					fmf_print_params(optarg);
+					exit(EXIT_SUCCESS);
+				} else {
+					print_help_version();
+					exit(EXIT_FAILURE);
+				}
+				break;
+			case '?':
+				print_help_version();
+				exit(EXIT_FAILURE);
+				break;
+			case ':':
+				print_help_version();
+				exit(EXIT_FAILURE);
+				break;
+			default:
+				print_help_version();
+				exit(EXIT_FAILURE);
+				break;
+			}
 		}
 	}
-	if (app->numof_valid_pts < 3) {
-		show_msg_box(ERR_INSUFF_DATA_PTS, app->window);
-		gtk_widget_grab_focus(app->time_entries[app->numof_valid_pts]);
-	}
-	return;
+	return EXIT_SUCCESS;
 }
 
-void G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
+void print_help_version()
 {
-	if (widget == NULL) { /* suppress compiler warning */ }
-	clear_all_except_data_points(app);
-	read_data_set(app);
-	//fmf_form_data_set ("example.json", data_set);
-	if (app->numof_valid_pts >= 3) {
-		app->models_params_vals = fmf_calc_params(app->data_set);
-		fill_out_labels(app);
-		generate_plots(app);
-		app->done_calculating_and_plotting = TRUE;
-	}
+	puts("To start GUI:               ./farmafit.exe,");
+	puts("To start from command-line: ./farmafit.exe -f example.json,");
+	puts("where \"example.json\" contains experimental measurement data.");
+	puts("For further help and version information see README.md");
 	return;
 }
 
@@ -201,12 +180,13 @@ void load_and_start_gui(int argc, char *argv[])
 	gtk_builder_add_from_file(builder, GLADE_FILE_NAME, NULL);
 	struct app app;
 	app.window = GTK_WINDOW(gtk_builder_get_object(builder, "top_window"));
-	/*** Place Slope view into KEY_BOX ***/
+	/*** Place Slope view (graph area) into KEY_BOX on the form ***/
 	GtkWidget *box;
 	box = GTK_WIDGET(gtk_builder_get_object(builder, KEY_BOX));
 	app.view = slope_view_new();
 	app.figure = slope_figure_new();
 	slope_view_set_figure(SLOPE_VIEW(app.view), app.figure);
+	/* TODO Retype "box" so that GTK_BOX is not needed?  */
 	gtk_box_pack_start(GTK_BOX(box), app.view, TRUE, TRUE, 0);
 	/*** Load IO widgets ***/
 	for (int i = 0; i < MAX_NUMOF_DATA_PTS; ++i) {
@@ -251,196 +231,7 @@ void load_and_start_gui(int argc, char *argv[])
 	return;
 }
 
-int main(int argc, char **argv)
-{
-	if (argc < 2) {
-		//fprintf(stderr, BASIC_ERROR_MESSAGE);
-		//help_version();
-		//exit(EXIT_FAILURE);
-		load_and_start_gui(argc, argv);
-		exit(EXIT_SUCCESS);
-	}
-	int c;
-	while ((c = getopt(argc, argv, ":hvgf:?")) != -1) {
-		switch (c) {
-		case 'h':
-			help_version();
-			exit(EXIT_SUCCESS);
-			break;
-		case 'v':
-			help_version();
-			exit(EXIT_SUCCESS);
-			break;
-		case 'g':
-			load_and_start_gui(argc, argv);
-			exit(EXIT_SUCCESS);
-			break;
-		case 'f':
-			if (argc == 3) {
-				fmf_print_params(optarg);
-				exit(EXIT_SUCCESS);
-			} else {
-				fprintf(stderr, BASIC_ERROR_MESSAGE);
-				help_version();
-				exit(EXIT_FAILURE);
-			}
-			break;
-		case '?':
-			fprintf(stderr, BASIC_ERROR_MESSAGE);
-			help_version();
-			exit(EXIT_FAILURE);
-			break;
-		case ':':
-			fprintf(stderr, BASIC_ERROR_MESSAGE);
-			help_version();
-			exit(EXIT_FAILURE);
-			break;
-		default:
-			fprintf(stderr, BASIC_ERROR_MESSAGE);
-			help_version();
-			exit(EXIT_FAILURE);
-			break;
-		}
-	}
-	return EXIT_SUCCESS;
-}
-
-void help_version()
-{
-	puts("Basic usage: ./farmafit -f example.json,");
-	puts("where example.json contains experimental measurement data.");
-	puts("For further help and version information see README.md");
-	return;
-}
-
-void clear_all_except_data_points(struct app *app) {
-	if (app->done_calculating_and_plotting) {
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[0]))) {
-			/* TODO Check if this will also clear lines on graph if plotted? */
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[0]), FALSE);
-			slope_scale_remove_item(app->scale, app->series_zo);
-		}
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[1]))) {
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[1]), FALSE);
-			slope_scale_remove_item(app->scale, app->series_fo);
-		}
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[2]))) {
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[2]), FALSE);
-			slope_scale_remove_item(app->scale, app->series_he);
-		}
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app->ticks[3]))) {
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[3]), FALSE);
-			slope_scale_remove_item(app->scale, app->series_pe);
-		}
-		slope_scale_remove_item(app->scale, app->series_md);
-		/* Four -1's are key to clearing the graph properly!  */
-		slope_scale_set_layout_rect(app->scale, -1, -1, -1, -1);
-		slope_view_redraw(SLOPE_VIEW(app->view));
-		for (int i = 0; i < NUMOF_MODELS_PARAMS; ++i) {
-			gtk_label_set_text(GTK_LABEL(app->models_params[i]), MSG_NOT_CALCED);
-		}
-	}
-	app->done_calculating_and_plotting = FALSE;
-	return;
-}
-
-void clear_data_points(struct app *app) {
-	for (int i = 0; i < MAX_NUMOF_DATA_PTS; ++i) {
-		gtk_entry_set_text(GTK_ENTRY(app->time_entries[i]), "");
-		gtk_entry_set_text(GTK_ENTRY(app->perc_entries[i]), "");
-	}
-	gtk_entry_set_text(GTK_ENTRY(app->time_entries[0]), "0");
-	gtk_entry_set_text(GTK_ENTRY(app->perc_entries[0]), "0");
-	return;
-}
-
-void
-G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app)
-{
-	if (widget == NULL) { /* suppress compiler warning */ }
-	clear_all_except_data_points(app);
-	clear_data_points(app);
-	return;
-}
-
-void
-G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget *widget, struct app *app)
-{
-	if (app->done_calculating_and_plotting) {
-		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
-			slope_scale_remove_item(app->scale, app->series_zo);
-		} else {
-			slope_scale_add_item(app->scale, app->series_zo);
-		}
-		slope_view_redraw(SLOPE_VIEW(app->view));
-	/* Condition (if) below is to prevent message box popping up twice.  */
-	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
-	} else {
-		show_msg_box(ERR_CALC_FIRST, app->window);
-	}
-	return;
-}
-
-void
-G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget *widget, struct app *app)
-{
-	if (app->done_calculating_and_plotting) {
-		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
-			slope_scale_remove_item(app->scale, app->series_fo);
-		} else {
-			slope_scale_add_item(app->scale, app->series_fo);
-		}
-		slope_view_redraw(SLOPE_VIEW(app->view));
-	/* Condition (if) below is to prevent message box popping up twice.  */
-	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
-	} else {
-		show_msg_box(ERR_CALC_FIRST, app->window);
-	}
-	return;
-}
-
-void
-G_MODULE_EXPORT on_tick_he_toggled(GtkWidget *widget, struct app *app)
-{
-	if (app->done_calculating_and_plotting) {
-		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
-			slope_scale_remove_item(app->scale, app->series_he);
-		} else {
-			slope_scale_add_item(app->scale, app->series_he);
-		}
-		slope_view_redraw(SLOPE_VIEW(app->view));
-	/* Condition (if) below is to prevent message box popping up twice.  */
-	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
-	} else {
-		show_msg_box(ERR_CALC_FIRST, app->window);
-	}
-	return;
-}
-
-void
-G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget *widget, struct app *app)
-{
-	if (app->done_calculating_and_plotting) {
-		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
-			slope_scale_remove_item(app->scale, app->series_pe);
-		} else {
-			slope_scale_add_item(app->scale, app->series_pe);
-		}
-		slope_view_redraw(SLOPE_VIEW(app->view));
-	/* Condition (if) below is to prevent message box popping up twice.  */
-	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
-	} else {
-		show_msg_box(ERR_CALC_FIRST, app->window);
-	}
-	return;
-}
-
-void
-G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget *widget, struct app *app)
+void G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget *widget, struct app *app)
 {
 	if (widget == NULL) { /* suppress compiler warning */ }
 	clear_all_except_data_points(app);
@@ -455,109 +246,178 @@ G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget *widget, struct app *app)
 	return;
 }
 
-void generate_plots(struct app *app)
+void G_MODULE_EXPORT on_btn_calc_and_plot_clicked(GtkWidget *widget, struct app *app)
 {
-	/* curr_point is for getting values out of data_set,
-	 * because it's only a pointer to a _single_ data point.  */
-	struct dp *curr_point = app->data_set;
-	int max_minutes = 0;
-	char *aux;
-	/* Two values below have to be declared and constructed like this.
-	 * since otherwise slope_xyseries_new_filled does not add them
-	 * properly to the graph.  */
-	double *data_time_values;
-	double *data_percentage_values;
-	data_time_values = (double *)g_malloc(app->numof_valid_pts * sizeof(double));
-	data_percentage_values = (double *)g_malloc(app->numof_valid_pts * sizeof(double));
-	SlopeSample data_time_ticks[app->numof_valid_pts];
-	for (unsigned int i = 0; i < app->numof_valid_pts; ++i) {
-		data_time_values[i] = curr_point->mins;
-		data_percentage_values[i] = curr_point->perc;
-		if (data_time_values[i] > max_minutes) {
-			max_minutes = data_time_values[i];
-		}
-		data_time_ticks[i].coord = data_time_values[i];
-		/* TODO This is  problematic!
-		 * strcpy(data_time_ticks[i].label, aux); does not work,
-		 * so every time I create a new aux (which is a char *),
-		 * and make label point to the same place, since otherwise I get
-		 * the same labels on the x axis. It needs to be fixed.
-		 * Perhas changing it to an array of aux's is a solution?  */
-		aux = (char *)g_malloc(STR_LEN_FOR_CONVERSION * sizeof(char));
-		snprintf(aux, STR_LEN_FOR_CONVERSION, "%d", (int)data_time_values[i]);
-		//strcpy(data_time_ticks[i].label, aux);
-		data_time_ticks[i].label = aux;
-		curr_point = curr_point->next;
+	if (widget == NULL) { /* suppress compiler warning */ }
+	clear_all_except_data_points(app);
+	read_data_set(app);
+	//fmf_form_data_set ("example.json", data_set);
+	if (app->numof_valid_pts >= 3) {
+		app->models_params_vals = fmf_calc_params(app->data_set);
+		fill_out_labels(app);
+		generate_plots(app);
+		app->done_calculating_and_plotting = TRUE;
 	}
-	app->scale = slope_xyscale_new();
-	slope_figure_add_scale(SLOPE_FIGURE(app->figure), app->scale);
-	slope_scale_set_layout_rect(app->scale, 0, 0, 1, 1);
-	/* TODO Consider free-ing everywhere  */
+	return;
+}
+
+void G_MODULE_EXPORT on_btn_clear_clicked(GtkWidget *widget, struct app *app)
+{
+	if (widget == NULL) { /* suppress compiler warning */ }
+	clear_all_except_data_points(app);
+	clear_data_points(app);
+	return;
+}
+
+/* TODO Combine all on_tick_??_toggled callback functions into one  */
+void G_MODULE_EXPORT on_tick_zo_toggled(GtkWidget *widget, struct app *app)
+{
 	if (app->done_calculating_and_plotting) {
-		free(app->series_md);
+		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
+			slope_scale_remove_item(app->scale, app->series[1]);
+		} else {
+			slope_scale_add_item(app->scale, app->series[1]);
+		}
+		slope_view_redraw(SLOPE_VIEW(app->view));
+	/* Condition (if) below is to prevent message box popping up twice.  */
+	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
+	} else {
+		show_msg_box(ERR_CALC_FIRST, app->window);
 	}
-	app->series_md =
-		slope_xyseries_new_filled(LBL_MEASURED_DATA, data_time_values,
-								  data_percentage_values, app->numof_valid_pts, "kor");
-	slope_scale_add_item(app->scale, app->series_md);
-	/*** Zero-order kinetics ***/
-	double *x_zo, *y_zo;
-	x_zo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	y_zo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
-		x_zo[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_zo[i] = app->models_params_vals.k0 * x_zo[i];
+	return;
+}
+
+/* TODO Combine all on_tick_??_toggled callback functions into one  */
+void G_MODULE_EXPORT on_tick_fo_toggled(GtkWidget *widget, struct app *app)
+{
+	if (app->done_calculating_and_plotting) {
+		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
+			slope_scale_remove_item(app->scale, app->series[2]);
+		} else {
+			slope_scale_add_item(app->scale, app->series[2]);
+		}
+		slope_view_redraw(SLOPE_VIEW(app->view));
+	/* Condition (if) below is to prevent message box popping up twice.  */
+	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
+	} else {
+		show_msg_box(ERR_CALC_FIRST, app->window);
 	}
-	app->series_zo =
-		slope_xyseries_new_filled(LBL_ZERO_ORDER_KINETICS, x_zo, y_zo,
-								  NUMOF_PLOT_PTS, "r-");
-	/*** First-order kinetics ***/
-	double *x_fo, *y_fo;
-	x_fo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	y_fo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
-		x_fo[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_fo[i] = (1 - exp(-1 * app->models_params_vals.k1 * x_fo[i])) * 100;
+	return;
+}
+
+/* TODO Combine all on_tick_??_toggled callback functions into one  */
+void G_MODULE_EXPORT on_tick_he_toggled(GtkWidget *widget, struct app *app)
+{
+	if (app->done_calculating_and_plotting) {
+		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
+			slope_scale_remove_item(app->scale, app->series[3]);
+		} else {
+			slope_scale_add_item(app->scale, app->series[3]);
+		}
+		slope_view_redraw(SLOPE_VIEW(app->view));
+	/* Condition (if) below is to prevent message box popping up twice.  */
+	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
+	} else {
+		show_msg_box(ERR_CALC_FIRST, app->window);
 	}
-	app->series_fo =
-		slope_xyseries_new_filled(LBL_FIRST_ORDER_KINETICS, x_fo, y_fo,
-								  NUMOF_PLOT_PTS, "m-");
-	/*** Higuchi's equation ***/
-	double *x_he, *y_he;
-	x_he = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	y_he = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
-		x_he[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_he[i] = app->models_params_vals.kh * sqrt(x_he[i]);
+	return;
+}
+
+/* TODO Combine all on_tick_??_toggled callback functions into one  */
+void G_MODULE_EXPORT on_tick_pe_toggled(GtkWidget *widget, struct app *app)
+{
+	if (app->done_calculating_and_plotting) {
+		if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
+			slope_scale_remove_item(app->scale, app->series[4]);
+		} else {
+			slope_scale_add_item(app->scale, app->series[4]);
+		}
+		slope_view_redraw(SLOPE_VIEW(app->view));
+	/* Condition (if) below is to prevent message box popping up twice.  */
+	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), FALSE);
+	} else {
+		show_msg_box(ERR_CALC_FIRST, app->window);
 	}
-	app->series_he =
-		slope_xyseries_new_filled(LBL_HIGUCHIS_EQUATION, x_he, y_he,
-								  NUMOF_PLOT_PTS, "g-");
-	/*** Peppas' equation ***/
-	double *x_pe, *y_pe;
-	x_pe = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	y_pe = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
-	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
-		x_pe[i] = (double)i *max_minutes / (NUMOF_PLOT_PTS - 1);
-		y_pe[i] =
-			app->models_params_vals.k * pow(x_pe[i], app->models_params_vals.tn);
+	return;
+}
+
+void destroy(GtkWidget *window)
+{
+	if (window == NULL) { /* suppress compiler warning */ }
+	gtk_main_quit();
+}
+
+gboolean delete_event(GtkWidget *window, GdkEvent *event)
+{
+	if (window == NULL || event == NULL) { /* suppress compiler warning */ }
+	return FALSE;
+}
+
+void read_data_set(struct app *app)
+{
+	fmf_init_data_set(app->data_set);
+	struct dp *current_point = app->data_set;
+	app->numof_valid_pts = 0;
+	char aux_t[STR_LEN_FOR_CONVERSION];
+	char aux_p[STR_LEN_FOR_CONVERSION];
+	/* First data point is special and has to be read separately  */
+	strcpy(aux_t, gtk_entry_get_text(GTK_ENTRY(app->time_entries[0])));
+	if (!digits_only(aux_t)) {
+		show_msg_box(ERR_INCORR_ENTRY, app->window);
+		gtk_widget_grab_focus(app->time_entries[0]);
+		return;
 	}
-	app->series_pe =
-		slope_xyseries_new_filled(LBL_PEPPAS_EQUATION, x_pe, y_pe,
-								  NUMOF_PLOT_PTS, "b-");
-	/*** Setting up the graph ***/
-	SlopeItem *x_axis;
-	x_axis =
-		slope_xyscale_get_axis(SLOPE_XYSCALE(app->scale), SLOPE_XYSCALE_AXIS_BOTTOM);
-	SlopeSampler *x_sampler;
-	x_sampler = slope_xyaxis_get_sampler(SLOPE_XYAXIS(x_axis));
-	slope_sampler_set_samples(x_sampler, data_time_ticks, app->numof_valid_pts);
-	slope_view_redraw(SLOPE_VIEW(app->view));
+	strcpy(aux_p, gtk_entry_get_text(GTK_ENTRY(app->perc_entries[0])));
+	if (!digits_or_single_pt_only(aux_p)) {
+		show_msg_box(ERR_INCORR_ENTRY, app->window);
+		gtk_widget_grab_focus(app->perc_entries[0]);
+		return;
+	}
+	current_point->mins = atof(aux_t);
+	current_point->perc = atof(aux_p);
+	++(app->numof_valid_pts);
+	/* Other data points can be read "normally"  */
+	gboolean found_the_end = FALSE;
+	for (unsigned int i = 1; i < MAX_NUMOF_DATA_PTS && !found_the_end; ++i) {
+		strcpy(aux_t, (char *)gtk_entry_get_text(GTK_ENTRY(app->time_entries[i])));
+		if (!digits_only(aux_t)) {
+			show_msg_box(ERR_INCORR_ENTRY, app->window);
+			gtk_widget_grab_focus(app->time_entries[i]);
+			return;
+		}
+		strcpy(aux_p, (char *)gtk_entry_get_text(GTK_ENTRY(app->perc_entries[i])));
+		if (!digits_or_single_pt_only(aux_p)) {
+			show_msg_box(ERR_INCORR_ENTRY, app->window);
+			gtk_widget_grab_focus(app->perc_entries[i]);
+			return;
+		}
+		if (atof(aux_t) == 0 || atof(aux_p) == 0 || strlen(aux_t) == 0
+			|| strlen(aux_p) == 0) {
+			found_the_end = TRUE;
+		} else {
+			struct dp *dp = (struct dp *)g_malloc(sizeof(struct dp));
+			dp->mins = atof(aux_t);
+			dp->perc = atof(aux_p);
+			current_point->next = dp;
+			current_point = dp;
+			current_point->next = NULL;
+			++(app->numof_valid_pts);
+		}
+	}
+	if (app->numof_valid_pts < 3) {
+		show_msg_box(ERR_INSUFF_DATA_PTS, app->window);
+		gtk_widget_grab_focus(app->time_entries[app->numof_valid_pts]);
+	}
 	return;
 }
 
 void fill_out_labels(struct app *app)
 {
+	/* TODO Consider changing struct models_params_vals into an array  */
 	char number[STR_LEN_FOR_CONVERSION];
 	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f", app->models_params_vals.k0);
 	gtk_label_set_text(GTK_LABEL(app->models_params[0]), number);
@@ -580,16 +440,154 @@ void fill_out_labels(struct app *app)
 	return;
 }
 
-void G_MODULE_EXPORT show_msg_box(char *msg_text, GtkWindow *window)
+void generate_plots(struct app *app)
 {
-	GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
-	GtkWidget *dialog;
-	dialog = gtk_message_dialog_new(window,
-									flags,
-									GTK_MESSAGE_ERROR,
-									GTK_BUTTONS_CLOSE, "%s", msg_text);
-	gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
+	/* curr_ptr is for getting values out of data_set,
+	 * because it's only a pointer to a _single_ data point.  */
+	struct dp *curr_ptr = app->data_set;
+	int max_minutes = 0;
+	char *aux;
+	/* Two values below have to be declared and constructed like this.
+	 * since otherwise slope_xyseries_new_filled does not add them
+	 * properly to the graph. They aslo have to be separate entities.  */
+	double *data_time_vals;
+	double *data_perc_vals;
+	data_time_vals = (double *)g_malloc(app->numof_valid_pts * sizeof(double));
+	data_perc_vals = (double *)g_malloc(app->numof_valid_pts * sizeof(double));
+	SlopeSample data_time_ticks[app->numof_valid_pts];
+	for (unsigned int i = 0; i < app->numof_valid_pts; ++i) {
+		data_time_vals[i] = curr_ptr->mins;
+		data_perc_vals[i] = curr_ptr->perc;
+		if (data_time_vals[i] > max_minutes) {
+			max_minutes = data_time_vals[i];
+		}
+		data_time_ticks[i].coord = data_time_vals[i];
+		/* TODO This is  problematic!
+		 * strcpy(data_time_ticks[i].label, aux); does not work,
+		 * so every time I create a new aux (which is a char *),
+		 * and make label point to the same place, since otherwise I get
+		 * the same labels on the x axis. It needs to be fixed.
+		 * Perhas changing it to an array of aux's is a solution?  */
+		aux = (char *)g_malloc(STR_LEN_FOR_CONVERSION * sizeof(char));
+		snprintf(aux, STR_LEN_FOR_CONVERSION, "%d", (int)data_time_vals[i]);
+		//strcpy(data_time_ticks[i].label, aux);
+		data_time_ticks[i].label = aux;
+		curr_ptr = curr_ptr->next;
+	}
+	app->scale = slope_xyscale_new();
+	/* TODO Check if SLOPE_FIGURE is really needed  */
+	slope_figure_add_scale(SLOPE_FIGURE(app->figure), app->scale);
+	slope_scale_set_layout_rect(app->scale, 0, 0, 1, 1);
+	/* TODO Consider free-ing everywhere  */
+	if (app->done_calculating_and_plotting) {
+		free(app->series[0]);
+	}
+	app->series[0] =
+		slope_xyseries_new_filled(LBL_MEASURED_DATA, data_time_vals,
+								  data_perc_vals, app->numof_valid_pts, "kor");
+	slope_scale_add_item(app->scale, app->series[0]);
+	/*** Zero-order kinetics ***/
+	double *x, *x_zo, *y_zo;
+	x = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	x_zo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	y_zo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
+		x[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
+		x_zo[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
+		y_zo[i] = app->models_params_vals.k0 * x_zo[i];
+	}
+	app->series[1] =
+		slope_xyseries_new_filled(LBL_ZERO_ORDER_KINETICS, x, y_zo,
+								  NUMOF_PLOT_PTS, "r-");
+	/*** First-order kinetics ***/
+	double *x_fo, *y_fo;
+	x_fo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	y_fo = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
+		x_fo[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
+		y_fo[i] = (1 - exp(-1 * app->models_params_vals.k1 * x_fo[i])) * 100;
+	}
+	app->series[2] =
+		slope_xyseries_new_filled(LBL_FIRST_ORDER_KINETICS, x, y_fo,
+								  NUMOF_PLOT_PTS, "m-");
+	/*** Higuchi's equation ***/
+	double *x_he, *y_he;
+	x_he = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	y_he = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
+		x_he[i] = i * (double)max_minutes / (NUMOF_PLOT_PTS - 1);
+		y_he[i] = app->models_params_vals.kh * sqrt(x_he[i]);
+	}
+	app->series[3] =
+		slope_xyseries_new_filled(LBL_HIGUCHIS_EQUATION, x, y_he,
+								  NUMOF_PLOT_PTS, "g-");
+	/*** Peppas' equation ***/
+	double *x_pe, *y_pe;
+	x_pe = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	y_pe = g_malloc(NUMOF_PLOT_PTS * sizeof(double));
+	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
+		x_pe[i] = (double)i *max_minutes / (NUMOF_PLOT_PTS - 1);
+		y_pe[i] =
+			app->models_params_vals.k * pow(x_pe[i], app->models_params_vals.tn);
+	}
+	app->series[4] =
+		slope_xyseries_new_filled(LBL_PEPPAS_EQUATION, x, y_pe,
+								  NUMOF_PLOT_PTS, "b-");
+	/*** Setting up the graph ***/
+	SlopeItem *x_axis;
+	x_axis =
+		slope_xyscale_get_axis(SLOPE_XYSCALE(app->scale), SLOPE_XYSCALE_AXIS_BOTTOM);
+	SlopeSampler *x_sampler;
+	/* TODO Check if x_axis can be declared to avoid casting  */
+	x_sampler = slope_xyaxis_get_sampler(SLOPE_XYAXIS(x_axis));
+	slope_sampler_set_samples(x_sampler, data_time_ticks, app->numof_valid_pts);
+	/* TODO Check if SLOPE_VIEW is really necessary  */
+	slope_view_redraw(SLOPE_VIEW(app->view));
+	return;
+}
+
+void clear_data_points(struct app *app)
+{
+	for (int i = 0; i < MAX_NUMOF_DATA_PTS; ++i) {
+		gtk_entry_set_text(GTK_ENTRY(app->time_entries[i]), "");
+		gtk_entry_set_text(GTK_ENTRY(app->perc_entries[i]), "");
+	}
+	gtk_entry_set_text(GTK_ENTRY(app->time_entries[0]), "0");
+	gtk_entry_set_text(GTK_ENTRY(app->perc_entries[0]), "0");
+	return;
+}
+
+void clear_all_except_data_points(struct app *app)
+{
+	if (app->done_calculating_and_plotting) {
+		for (int i = 0; i < NUMOF_MODELS; ++i) {
+			/* TODO Check if this will also clear lines on graph if plotted? */
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->ticks[i]), FALSE);
+			/* [i + 1] is because series[0] is measured data (cleared below)  */
+			slope_scale_remove_item(app->scale, app->series[i + 1]);
+		}
+		slope_scale_remove_item(app->scale, app->series[0]);
+		/* Four -1's are key to clearing the graph properly!  */
+		slope_scale_set_layout_rect(app->scale, -1, -1, -1, -1);
+		slope_view_redraw(SLOPE_VIEW(app->view));
+		for (int i = 0; i < NUMOF_MODELS_PARAMS; ++i) {
+			gtk_label_set_text(GTK_LABEL(app->models_params[i]), MSG_NOT_CALCED);
+		}
+	}
+	app->done_calculating_and_plotting = FALSE;
+	return;
+}
+
+gboolean digits_only(char *entry)
+{
+	gboolean all_good_flag = TRUE;
+	size_t str_len = strlen(entry);
+	for (unsigned int i = 0; i < str_len; ++i) {
+		if (!(isdigit(entry[i]))) {
+			return FALSE;
+		}
+	}
+	return all_good_flag;
 }
 
 gboolean digits_or_single_pt_only(char *entry)
@@ -612,26 +610,15 @@ gboolean digits_or_single_pt_only(char *entry)
 	return all_good_flag;
 }
 
-gboolean digits_only(char *entry)
+void G_MODULE_EXPORT show_msg_box(char *msg_text, GtkWindow *window)
 {
-	gboolean all_good_flag = TRUE;
-	size_t str_len = strlen(entry);
-	for (unsigned int i = 0; i < str_len; ++i) {
-		if (!(isdigit(entry[i]))) {
-			return FALSE;
-		}
-	}
-	return all_good_flag;
-}
-
-void destroy(GtkWidget *window)
-{
-	if (window == NULL) { /* suppress compiler warning */ }
-	gtk_main_quit();
-}
-
-gboolean delete_event(GtkWidget *window, GdkEvent *event)
-{
-	if (window == NULL || event == NULL) { /* suppress compiler warning */ }
-	return FALSE;
+	/* TODO Change localization so that "Close" button label is in English  */
+	GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+	GtkWidget *dialog;
+	dialog = gtk_message_dialog_new(window,
+									flags,
+									GTK_MESSAGE_ERROR,
+									GTK_BUTTONS_CLOSE, "%s", msg_text);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
 }

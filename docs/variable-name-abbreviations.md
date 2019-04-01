@@ -16,6 +16,7 @@ lbls	= labels
 len 	= length
 max 	= maximum
 min 	= minumim
+mins	= minutes
 msg 	= message
 num 	= number
 numof 	= number of
