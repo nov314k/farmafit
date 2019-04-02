@@ -1,5 +1,6 @@
 # Todo
 
+Correct the look of equations in tooltips in glade file.
 Fix Makefile so only one glade files needs to be used.
 Create an installer with http://www.jrsoftware.org/isinfo.php (Inno).
 Update README.md to reflect latest and greatest development.
