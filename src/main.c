@@ -265,9 +265,11 @@ void G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget * widget, struct app *app)
 	clear_data_points(app);
 	char number_as_string[STR_LEN_FOR_CONVERSION];
 	for (int i = 0; i < MAX_NUMOF_DATA_PTS; ++i) {
-		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.0f", eg_data_time_vals[i]);
+		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.0f",
+				 eg_data_time_vals[i]);
 		gtk_entry_set_text(GTK_ENTRY(app->time_entries[i]), number_as_string);
-		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.3f", eg_data_perc_vals[i]);
+		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.3f",
+				 eg_data_perc_vals[i]);
 		gtk_entry_set_text(GTK_ENTRY(app->perc_entries[i]), number_as_string);
 	}
 	return;
@@ -400,13 +402,15 @@ void read_data_set(struct app *app)
 	char aux_t[STR_LEN_FOR_CONVERSION];
 	char aux_p[STR_LEN_FOR_CONVERSION];
 	/* First data point is special and has to be read separately  */
-	strncpy(aux_t, gtk_entry_get_text(GTK_ENTRY(app->time_entries[0])), STR_LEN_FOR_CONVERSION);
+	strncpy(aux_t, gtk_entry_get_text(GTK_ENTRY(app->time_entries[0])),
+			STR_LEN_FOR_CONVERSION);
 	if (!digits_only(aux_t)) {
 		show_msg_box(ERR_INCORR_ENTRY, app->window);
 		gtk_widget_grab_focus(app->time_entries[0]);
 		return;
 	}
-	strncpy(aux_p, gtk_entry_get_text(GTK_ENTRY(app->perc_entries[0])), STR_LEN_FOR_CONVERSION);
+	strncpy(aux_p, gtk_entry_get_text(GTK_ENTRY(app->perc_entries[0])),
+			STR_LEN_FOR_CONVERSION);
 	if (!digits_or_single_pt_only(aux_p)) {
 		show_msg_box(ERR_INCORR_ENTRY, app->window);
 		gtk_widget_grab_focus(app->perc_entries[0]);
@@ -418,13 +422,15 @@ void read_data_set(struct app *app)
 	/* Other data points can be read "normally"  */
 	gboolean found_the_end = FALSE;
 	for (unsigned int i = 1; i < MAX_NUMOF_DATA_PTS && !found_the_end; ++i) {
-		strncpy(aux_t, gtk_entry_get_text(GTK_ENTRY(app->time_entries[i])), STR_LEN_FOR_CONVERSION);
+		strncpy(aux_t, gtk_entry_get_text(GTK_ENTRY(app->time_entries[i])),
+				STR_LEN_FOR_CONVERSION);
 		if (!digits_only(aux_t)) {
 			show_msg_box(ERR_INCORR_ENTRY, app->window);
 			gtk_widget_grab_focus(app->time_entries[i]);
 			return;
 		}
-		strncpy(aux_p, gtk_entry_get_text(GTK_ENTRY(app->perc_entries[i])), STR_LEN_FOR_CONVERSION);
+		strncpy(aux_p, gtk_entry_get_text(GTK_ENTRY(app->perc_entries[i])),
+				STR_LEN_FOR_CONVERSION);
 		if (!digits_or_single_pt_only(aux_p)) {
 			show_msg_box(ERR_INCORR_ENTRY, app->window);
 			gtk_widget_grab_focus(app->perc_entries[i]);
@@ -494,6 +500,7 @@ void generate_plots(struct app *app)
 	/* Two values below have to be allocated like this, since otherwise
 	 * slope_xyseries_new_filled does not add them properly to the graph.
 	 * They also have to be separate entities.  */
+	/* TODO Double-check the above conclusion  */
 	app->xy_vals[0] = malloc(sizeof(*app->xy_vals[0]) * app->numof_valid_pts);
 	assert(NULL != app->xy_vals[0]);
 	app->xy_vals[1] = malloc(sizeof(*app->xy_vals[1]) * app->numof_valid_pts);

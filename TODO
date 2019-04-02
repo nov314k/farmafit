@@ -2,24 +2,27 @@
 
 ## For next version
 
-Do not add doxygen docs to git
-Create an installer with http://www.jrsoftware.org/isinfo.php (Inno)
-Run valgrind
-Ask whether Slope objects need to be freed/unreferenced
-Work out if G objects need to be freed/unreferenced
-Fix up the processing of command-line parameters
-Investigate a neat Makefile that I can use for slope and submit
-Add screenshots to README.md
-Further explain rsq in README
-Check this: Change the types of linear_regression() arguments so there is no need for converting from a linked list of data points to two separate arrays
-Check this: Or perhaps change the linear_regression functions to accept the linked list as the input so the calculations can be done from there
+Fix problems due to using -pedantic (Slope-related).
+Do not add doxygen docs to git.
+Create an installer with http://www.jrsoftware.org/isinfo.php (Inno).
+Run valgrind.
+Ask whether Slope objects need to be freed/unreferenced.
+Work out if GObjects need to be freed/unreferenced.
+Fix up the processing of command-line parameters.
+Investigate a neat Makefile that I can use for slope and submit.
+Add screenshots to README.md.
+Further explain rsq in README.
+Check this: Change the types of linear_regression() arguments so there is no
+need for converting from a linked list of data points to two separate arrays.
+Check this: Or perhaps change the linear_regression functions to accept the
+linked list as the input so the calculations can be done from there.
 
 ## Process TODO from src/
 
 ## Long-term todos
 
-Add a check that the input file is present
-Multiple experiments
-Exporting to CSV
-Add support for --help and --version
-Consider using gtkdatabox
+Add a check that the input file is present.
+Multiple experiments.
+Exporting to CSV.
+Add support for --help and --version.
+Consider using gtkdatabox.
