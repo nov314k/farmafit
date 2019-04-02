@@ -1,17 +1,19 @@
 # Todo
 
+Fix Makefile so only one glade files needs to be used.
+Create an installer with http://www.jrsoftware.org/isinfo.php (Inno).
+Update README.md to reflect latest and greatest development.
+Add screenshots to README.md.
+
 ## For next version
 
 Fix problems due to using -pedantic (Slope-related).
-Do not add doxygen docs to git.
-Create an installer with http://www.jrsoftware.org/isinfo.php (Inno).
 Run valgrind.
 Ask whether Slope objects need to be freed/unreferenced.
 Work out if GObjects need to be freed/unreferenced.
 Fix up the processing of command-line parameters.
-Investigate a neat Makefile that I can use for slope and submit.
-Add screenshots to README.md.
 Further explain rsq in README.
+Investigate a neat Makefile that I can use for slope and submit.
 Check this: Change the types of linear_regression() arguments so there is no
 need for converting from a linked list of data points to two separate arrays.
 Check this: Or perhaps change the linear_regression functions to accept the

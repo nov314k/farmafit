@@ -1,0 +1,30 @@
+Array names in plural.
+
+beg 	= beginning
+btn		= button
+calc	= calculate
+calcing	= calculating
+calcn	= calculation
+calced	= calculated
+corr 	= correct
+curr	= current
+eg 		= example
+eq 		= equation
+incorr 	= incorrect
+lbl 	= label
+lbls	= labels
+len 	= length
+max 	= maximum
+min 	= minumim
+mins	= minutes
+msg 	= message
+num 	= number
+numof 	= number of
+param 	= parameter
+params 	= parameters
+perc 	= percentage
+pt 		= point
+pts 	= points
+suff 	= sufficient
+str 	= string
+val		= value

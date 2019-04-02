@@ -49,7 +49,7 @@
 #define MSG_NOT_CALCED "Not calculated"
 #define ERR_INCORR_ENTRY "ERROR: Incorrect entry."
 #define ERR_INSUFF_DATA_PTS "ERROR: Enter at least 3 valid data points."
-#define ERR_CALC_FIRST "ERROR: Please calculate models parameters first."
+#define ERR_CALC_FIRST "ERROR: Please calculate model parameters first."
 #define LBL_MEASURED_DATA "Measured data"
 #define LBL_PEPPAS_EQUATION "Peppas' equation"
 #define LBL_HIGUCHIS_EQUATION "Higuchi's equation"
