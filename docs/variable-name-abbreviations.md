@@ -1,4 +1,4 @@
-Name arrays in plural.
+Array names in plural.
 
 beg 	= beginning
 btn		= button

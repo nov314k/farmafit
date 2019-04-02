@@ -105,6 +105,7 @@ struct app {
 	double *xy_vals[NUMOF_XY_VALS];
 	struct models_params models_params_vals;
 	unsigned int numof_valid_pts;
+	/* Only used this g-type (and no other glib functions)  */
 	gboolean done_calculating_and_plotting;
 };
 
@@ -264,11 +265,9 @@ void G_MODULE_EXPORT on_btn_load_eg_clicked(GtkWidget * widget, struct app *app)
 	clear_data_points(app);
 	char number_as_string[STR_LEN_FOR_CONVERSION];
 	for (int i = 0; i < MAX_NUMOF_DATA_PTS; ++i) {
-		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.0f",
-				 eg_data_time_vals[i]);
+		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.0f", eg_data_time_vals[i]);
 		gtk_entry_set_text(GTK_ENTRY(app->time_entries[i]), number_as_string);
-		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.3f",
-				 eg_data_perc_vals[i]);
+		snprintf(number_as_string, STR_LEN_FOR_CONVERSION, "%.3f", eg_data_perc_vals[i]);
 		gtk_entry_set_text(GTK_ENTRY(app->perc_entries[i]), number_as_string);
 	}
 	return;
@@ -392,24 +391,22 @@ gboolean delete_event(GtkWidget * window, GdkEvent * event)
 
 void read_data_set(struct app *app)
 {
-	app->data_set = g_malloc(sizeof(*app->data_set));
+	app->data_set = malloc(sizeof(*app->data_set));
 	assert(NULL != app->data_set);
 	fmf_init_data_set(app->data_set);
 	struct dp *dp;
 	struct dp *curr_point = app->data_set;
 	app->numof_valid_pts = 0;
-	char *aux_t = g_malloc(sizeof(*aux_t) * STR_LEN_FOR_CONVERSION);
-	assert(NULL != aux_t);
-	char *aux_p = g_malloc(sizeof(*aux_p) * STR_LEN_FOR_CONVERSION);
-	assert(NULL != aux_p);
+	char aux_t[STR_LEN_FOR_CONVERSION];
+	char aux_p[STR_LEN_FOR_CONVERSION];
 	/* First data point is special and has to be read separately  */
-	aux_t = g_strdup(gtk_entry_get_text(GTK_ENTRY(app->time_entries[0])));
+	strncpy(aux_t, gtk_entry_get_text(GTK_ENTRY(app->time_entries[0])), STR_LEN_FOR_CONVERSION);
 	if (!digits_only(aux_t)) {
 		show_msg_box(ERR_INCORR_ENTRY, app->window);
 		gtk_widget_grab_focus(app->time_entries[0]);
 		return;
 	}
-	aux_p = g_strdup(gtk_entry_get_text(GTK_ENTRY(app->perc_entries[0])));
+	strncpy(aux_p, gtk_entry_get_text(GTK_ENTRY(app->perc_entries[0])), STR_LEN_FOR_CONVERSION);
 	if (!digits_or_single_pt_only(aux_p)) {
 		show_msg_box(ERR_INCORR_ENTRY, app->window);
 		gtk_widget_grab_focus(app->perc_entries[0]);
@@ -421,13 +418,13 @@ void read_data_set(struct app *app)
 	/* Other data points can be read "normally"  */
 	gboolean found_the_end = FALSE;
 	for (unsigned int i = 1; i < MAX_NUMOF_DATA_PTS && !found_the_end; ++i) {
-		aux_t = g_strdup(gtk_entry_get_text(GTK_ENTRY(app->time_entries[i])));
+		strncpy(aux_t, gtk_entry_get_text(GTK_ENTRY(app->time_entries[i])), STR_LEN_FOR_CONVERSION);
 		if (!digits_only(aux_t)) {
 			show_msg_box(ERR_INCORR_ENTRY, app->window);
 			gtk_widget_grab_focus(app->time_entries[i]);
 			return;
 		}
-		aux_p = g_strdup(gtk_entry_get_text(GTK_ENTRY(app->perc_entries[i])));
+		strncpy(aux_p, gtk_entry_get_text(GTK_ENTRY(app->perc_entries[i])), STR_LEN_FOR_CONVERSION);
 		if (!digits_or_single_pt_only(aux_p)) {
 			show_msg_box(ERR_INCORR_ENTRY, app->window);
 			gtk_widget_grab_focus(app->perc_entries[i]);
@@ -437,7 +434,7 @@ void read_data_set(struct app *app)
 			|| strlen(aux_p) == 0) {
 			found_the_end = TRUE;
 		} else {
-			dp = g_malloc(sizeof(*dp));
+			dp = malloc(sizeof(*dp));
 			assert(NULL != dp);
 			dp->mins = atof(aux_t);
 			dp->perc = atof(aux_p);
@@ -451,10 +448,6 @@ void read_data_set(struct app *app)
 		show_msg_box(ERR_INSUFF_DATA_PTS, app->window);
 		gtk_widget_grab_focus(app->time_entries[app->numof_valid_pts]);
 	}
-	g_free(aux_t);
-	aux_t = NULL;
-	g_free(aux_p);
-	aux_p = NULL;
 	return;
 }
 
@@ -501,9 +494,9 @@ void generate_plots(struct app *app)
 	/* Two values below have to be allocated like this, since otherwise
 	 * slope_xyseries_new_filled does not add them properly to the graph.
 	 * They also have to be separate entities.  */
-	app->xy_vals[0] = g_malloc(sizeof(*app->xy_vals[0]) * app->numof_valid_pts);
+	app->xy_vals[0] = malloc(sizeof(*app->xy_vals[0]) * app->numof_valid_pts);
 	assert(NULL != app->xy_vals[0]);
-	app->xy_vals[1] = g_malloc(sizeof(*app->xy_vals[1]) * app->numof_valid_pts);
+	app->xy_vals[1] = malloc(sizeof(*app->xy_vals[1]) * app->numof_valid_pts);
 	assert(NULL != app->xy_vals[1]);
 	SlopeSample data_time_ticks[app->numof_valid_pts];
 	for (unsigned int i = 0; i < app->numof_valid_pts; ++i) {
@@ -514,7 +507,8 @@ void generate_plots(struct app *app)
 		}
 		data_time_ticks[i].coord = app->xy_vals[0][i];
 		snprintf(aux, STR_LEN_FOR_CONVERSION, "%d", (int)app->xy_vals[0][i]);
-		data_time_ticks[i].label = g_strdup(aux);
+		/* .label's are freed at the end of the function  */
+		data_time_ticks[i].label = strdup(aux);
 		curr_ptr = curr_ptr->next;
 	}
 	app->scale = slope_xyscale_new();
@@ -527,7 +521,7 @@ void generate_plots(struct app *app)
 	slope_scale_add_item(app->scale, app->series[0]);
 	/*** Series for four models ***/
 	for (int i = 2; i < NUMOF_XY_VALS; ++i) {
-		app->xy_vals[i] = g_malloc(sizeof(*app->xy_vals[i]) * NUMOF_PLOT_PTS);
+		app->xy_vals[i] = malloc(sizeof(*app->xy_vals[i]) * NUMOF_PLOT_PTS);
 		assert(NULL != app->xy_vals[i]);
 	}
 	for (int i = 0; i < NUMOF_PLOT_PTS; ++i) {
@@ -565,6 +559,10 @@ void generate_plots(struct app *app)
 	slope_sampler_set_samples(x_sampler, data_time_ticks, app->numof_valid_pts);
 	/* TODO Check if SLOPE_VIEW is really necessary  */
 	slope_view_redraw(SLOPE_VIEW(app->view));
+	for (unsigned int i = 0; i < app->numof_valid_pts; ++i) {
+		free(data_time_ticks[i].label);
+		data_time_ticks[i].label = NULL;
+	}
 	return;
 }
 
@@ -602,12 +600,12 @@ void clear_all_except_data_points(struct app *app)
 		while (app->data_set != NULL) {
 			curr = app->data_set;
 			app->data_set = app->data_set->next;
-			g_free(curr);
+			free(curr);
 		}
 		app->data_set = NULL;
 		/* Free xy_vals memory  */
 		for (int i = 0; i < NUMOF_XY_VALS; ++i) {
-			g_free(app->xy_vals[i]);
+			free(app->xy_vals[i]);
 			app->xy_vals[i] = NULL;
 		}
 	}
@@ -617,6 +615,10 @@ void clear_all_except_data_points(struct app *app)
 
 gboolean digits_only(char *entry)
 {
+	/* TODO This check is not really necessary? */
+	if (entry == NULL) {
+		return FALSE;
+	}
 	gboolean all_good_flag = TRUE;
 	for (unsigned int i = 0; i < strlen(entry); ++i) {
 		if (!(isdigit(entry[i]))) {
@@ -628,6 +630,10 @@ gboolean digits_only(char *entry)
 
 gboolean digits_or_single_pt_only(char *entry)
 {
+	/* TODO This check is not really necessary? */
+	if (entry == NULL) {
+		return FALSE;
+	}
 	gboolean all_good_flag = TRUE;
 	int numof_pts = 0;
 	for (unsigned int i = 0; i < strlen(entry); ++i) {
