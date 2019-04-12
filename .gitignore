@@ -1,0 +1,16 @@
+expl
+#*#
+.#*.
+*~
+*.bak
+*.a
+*.o
+*.exe
+*.c.swp
+*.h.swp
+glade
+otwo
+errors.txt
+releases/dlls
+releases/testing
+doxygen
