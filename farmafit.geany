@@ -28,9 +28,9 @@ long_line_column=80
 
 [files]
 current_page=0
-FILE_NAME_0=5534;C;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Csrc%5Cmain.c;0;4
-FILE_NAME_1=287;Markdown;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Cdocs%5Cvariable-name-abbreviations.md;0;4
-FILE_NAME_2=89;Markdown;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Cdocs%5Cdesdecs.md;0;4
-FILE_NAME_3=8752;C;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Csrc%5Cfarmafit.c;0;4
-FILE_NAME_4=4;C++;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Csrc%5Cdata_types.h;0;4
-FILE_NAME_5=4279;C++;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Csrc%5Cfarmafit.h;0;4
+FILE_NAME_0=2460;C;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Csrc%5Cmain.c;0;4
+FILE_NAME_1=289;Markdown;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Cdocs%5Cdesdecs.md;0;4
+FILE_NAME_2=0;Markdown;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Cdocs%5Cabbrevs.md;0;4
+FILE_NAME_3=4;C++;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Csrc%5Cdata_types.h;0;4
+FILE_NAME_4=4279;C++;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Csrc%5Cfarmafit.h;0;4
+FILE_NAME_5=8752;C;0;EUTF-8;1;1;1;C%3A%5Cmsys64%5Chome%5Cnovak%5Cdev%5Cfarmafit%5Csrc%5Cfarmafit.c;0;4

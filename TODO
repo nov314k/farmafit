@@ -1,14 +1,17 @@
 # Todo
-
 Correct the look of equations in tooltips in glade file.
 Fix Makefile so only one glade files needs to be used.
 Create an installer with http://www.jrsoftware.org/isinfo.php (Inno).
 Update README.md to reflect latest and greatest development.
 Add screenshots to README.md.
+Remove doxygen from GH.
+Add a note that minutes can only be whole numbers.
 
 ## For next version
-
+Do a screen-cast of usage.
+Installer.
 Fix problems due to using -pedantic (Slope-related).
+Compile and run on Debian.
 Run valgrind.
 Ask whether Slope objects need to be freed/unreferenced.
 Work out if GObjects need to be freed/unreferenced.
@@ -23,9 +26,9 @@ linked list as the input so the calculations can be done from there.
 ## Process TODO from src/
 
 ## Long-term todos
-
 Add a check that the input file is present.
 Multiple experiments.
 Exporting to CSV.
 Add support for --help and --version.
 Consider using gtkdatabox.
+Add .gitignore tempalte for C projects.
