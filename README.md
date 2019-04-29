@@ -1,27 +1,38 @@
 # _Farmafit_
-_Farmafit_ extracts model parameters for modelling the release of pharmacological substances.
+_Farmafit_ models and illustrates releasing of pharmacological substances.
 
-![Screenshot](/screenshot.png "Screenshot")
+Screen shot of the GUI version:
+![Screenshot](/docs/sshot-gui.png "Screenshot GUI")
 
-## Configuration
+Screen shot of the command-line version:
+![Screenshot](/docs/sshot-cli.png "Screenshot Terminal")
 
-All development and testing was done on MSYS2. No special configuration provisions are needed.
+## Video Usage Guide
 
-## Compiling
+For a brief guide on how to use Farmati, see
+[Farmafit Video Guide on YouTube](https://www.youtube.com/watch?v=CpnMuYuMBLU "Farmafit Video Guide")
+
+## Installation on Windows
+
+
+
+## Compiling from Source
 
 To compile, execute `make` in the root directory. See `Makefile` for further details.
 
-## Libraries
+All development and testing was done on MSYS2. No special configuration provisions are needed.
+
+## Libraries Used
 
 _cJSON_, the ultraweight JSON parser, [github.com/DaveGamble/cJSON](https://github.com/DaveGamble/cJSON), is used to process the input JSON file.
 
 _Slope_, the C/GTK+ data visualization library, [github.com/bytebrew/slope](https://github.com/bytebrew/slope), is used for plotting in the GUI version.
 
-## Usage
+## Command-line Version Usage
 
 Create an input file which contains measured data points, in JSON format and using a plain text editor. Use `example.json` in the root directory as a model. You can give this input file any name that you like.
 
-In the input JSON file, for _"experiment_name"_, enter a suitable experiment name/identifier (enclosed in double quotation marks). This identifier is used only for clearer reporting of results. 
+In the input JSON file, for _"experiment_name"_, enter a suitable experiment name/identifier (enclosed in double quotation marks). This identifier is used only for clearer reporting of results.
 
 For each of _"data_points"_, enter _"minutes"_ and _"percentage"_. Minutes is the number of minutes elapsed from the start of the experiment (when _"minutes"_ = 0), and _"percentage"_ is the percentage of the substance dissolved at that time. Values for _"minutes"_ and _"percentage"_ are entered without double quotes.
 
@@ -49,8 +60,8 @@ Here is the content of the `example.json` file, which can be found in the _Farma
       { "minutes": 45,  "percentage": 15.316 },
       { "minutes": 60,  "percentage": 19.195 },
       { "minutes": 90,  "percentage": 28.426 },
-      { "minutes": 120, "percentage": 35.830 },      
-      { "minutes": 150, "percentage": 41.672 },    
+      { "minutes": 120, "percentage": 35.830 },
+      { "minutes": 150, "percentage": 41.672 },
       { "minutes": 180, "percentage": 49.569 },
       { "minutes": 240, "percentage": 62.338 },
       { "minutes": 300, "percentage": 72.883 },
