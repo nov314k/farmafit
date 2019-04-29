@@ -16,7 +16,7 @@ For a brief guide on how to use Farmati, see
 
 ## Installation on Windows
 
-Windows installers are `releases/farmafit-X.Y-installer.exe` where X.Y signify version numbers. `*.zip` files in `releases` folder contain all files required to run the application without installation.
+Windows installers are `releases/farmafit-X.Y-installer.exe` where X.Y signifies version number. `*.zip` files in `releases` folder contain all files required to run the application without installation.
 
 ## Compiling from Source
 
