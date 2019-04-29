@@ -2,9 +2,11 @@
 _Farmafit_ models and illustrates releasing of pharmacological substances.
 
 Screen shot of the GUI version:
+
 ![Screenshot](/docs/sshot-gui.png "Screenshot GUI")
 
 Screen shot of the command-line version:
+
 ![Screenshot](/docs/sshot-cli.png "Screenshot Terminal")
 
 ## Video Usage Guide
@@ -14,7 +16,7 @@ For a brief guide on how to use Farmati, see
 
 ## Installation on Windows
 
-
+Windows installers are `releases/farmafit-X.Y-installer.exe` where X.Y signify version numbers. `*.zip` files in `releases` folder contain all files required to run the application without installation.
 
 ## Compiling from Source
 
