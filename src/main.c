@@ -474,7 +474,7 @@ void fill_out_labels(struct app *app)
 			 app->models_params_vals.rsq_k1);
 	gtk_label_set_text(GTK_LABEL(app->models_params[3]), number);
 	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f",
-			 app->models_params_vals.kh);
+			 app->models_params_vals.k1);
 	gtk_label_set_text(GTK_LABEL(app->models_params[4]), number);
 	snprintf(number, STR_LEN_FOR_CONVERSION, "%.4f",
 			 app->models_params_vals.rsq_kh);
