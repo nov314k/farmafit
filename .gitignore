@@ -14,5 +14,4 @@ errors.txt
 releases/dlls
 releases/testing
 releases/output
-doxygen
 !releases/farmafit-0.2-setup.exe
