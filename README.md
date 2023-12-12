@@ -120,8 +120,3 @@ _Farmafit_ calculates `k` and `n`.
 
 See [doxygen/html/index.html](/doxygen/html/index.html) for source code documentation.
 
-## Authors
-
-[Associate Professor Jelena Djuris](http://www.ph.bg.ac.rs/en/about-us/associate-professors/1706/jelena-%C4%91uri%C5%A1-phd/)
-
-[Novak Petrovic](https://github.com/novakpetrovic/)
