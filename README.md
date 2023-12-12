@@ -1,5 +1,3 @@
-this is torino on IRC
-
 # _Farmafit_
 _Farmafit_ models and illustrates releasing of pharmacological substances.
 
